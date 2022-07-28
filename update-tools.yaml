@@ -1,0 +1,343 @@
+---
+defaults:
+  bin_dir: $HOME/bin
+  opt_dir: /opt
+  tmp_dir: /tmp
+  pkg_dir: $HOME/Repos/packages
+  ver:
+    type: cmd
+    name: "{{ tool.name }} --version"
+    regex: '\d.*'
+  git:
+    look_up: releases
+    tag: latest
+    custom: no
+    token_env: GITHUB_TOKEN
+
+tools:
+  - name: peazip
+    type: git
+    repo: peazip/PeaZip
+    incl:
+      - LINUX.Qt5-1.x86_64
+      - rpm
+  - name: duf
+    type: git
+    repo: muesli/duf
+    incl:
+      - linux_amd64
+      - rpm
+  - name: glow
+    type: git
+    repo: charmbracelet/glow
+    incl:
+      - linux_amd64
+      - rpm
+  - name: dive
+    type: git
+    repo: wagoodman/dive
+    incl:
+      - linux_amd64
+      - rpm
+  - name: onlyoffice
+    type: git
+    repo: ONLYOFFICE/DesktopEditors
+    incl:
+      - x86_64
+      - rpm
+  - name: rclone
+    type: git
+    repo: rclone/rclone
+    incl:
+      - linux-amd64
+      - rpm
+  - name: koodo
+    type: git
+    repo: troyeguo/koodo-reader
+    incl:
+      - Koodo
+      - rpm
+  - name: drawio
+    type: git
+    repo: jgraph/drawio-desktop
+    incl:
+      - x86_64
+      - rpm
+  - name: gdu
+    type: git
+    repo: dundee/gdu
+    incl:
+      - x86_64
+      - rpm
+  - name: trivy
+    type: git
+    repo: aquasecurity/trivy
+    incl:
+      - Linux-64bit
+      - rpm
+  - name: terraform-docs
+    type: git
+    repo: terraform-docs/terraform-docs
+    incl:
+      - linux-amd64
+      - tar.gz
+    inst:
+      - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.name }}"
+    ver:
+      regex: 'v([\d\.].*?) '
+  - name: terramate
+    type: git
+    repo: mineiros-io/terramate
+    incl:
+      - linux_x86_64
+      - tar.gz
+    inst:
+      - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.name }}"
+  - name: tfsec
+    type: git
+    repo: aquasecurity/tfsec
+    incl:
+      - linux-amd64
+      - tfsec
+    excl:
+      - checkgen
+      - sig
+    inst:
+      - install "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.bin_dir }}/{{ tool.name }}"
+  - name: duplicati
+    type: git
+    repo: duplicati/duplicati
+    tag: beta
+    incl:
+      - noarch
+      - rpm
+  - name: posh
+    type: git
+    repo: JanDeDobbeleer/oh-my-posh
+    incl:
+      - linux-amd64
+    excl:
+      - sha256
+      - sig
+    inst:
+      - install "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.bin_dir }}/oh-my-posh"
+    ver:
+      name: oh-my-posh --version
+  - name: infracost
+    type: git
+    repo: infracost/infracost
+    incl:
+      - linux-amd64
+      - tar.gz
+    excl:
+      - sha256
+    inst:
+      - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" --transform='s/{{ tool.name }}.*/{{ tool.name }}/'
+  - name: insomnia
+    type: git
+    repo: Kong/insomnia
+    tag: core
+    not_tags:
+      - alpha
+      - beta
+    incl:
+      - Core
+      - rpm
+    ver:
+      file:
+  - name: podman-desktop-companion
+    type: git
+    repo: iongion/podman-desktop-companion
+    tag: 4.1.0-rc.28
+    incl:
+      - x86_64
+      - flatpak
+    inst:
+      - flatpak install --or-update -y --bundle "{{ tool.pkg_dir }}/{{ tool.pkg_name }}"
+    ver:
+      cmd: flatpak info io.github.iongion.PodmanDesktopCompanion
+      regex: 'Version: (.*)'
+  - name: pdfsam
+    type: git
+    repo: torakiki/pdfsam
+    incl:
+      - linux
+      - tar.gz
+    excl:
+      - asc
+    inst:
+      - tar --strip-components=1 -C "{{ tool.opt_dir }}/{{ tool.name }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}"
+    ver:
+      type: file
+      name: "{{ tool.opt_dir }}/{{ tool.name }}/pdfsam-basic-*.jar"
+      regex: 'pdfsam-basic-(.*?).jar'
+  - name: markdown2confluence
+    type: git
+    repo: justmiles/go-markdown2confluence
+    incl:
+      - linux_x86_64
+      - tar.gz
+    inst:
+      - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.name }}"
+    ver:
+      regex: 'markdown2confluence (.*)'
+  - name: curl-impersonate
+    type: git
+    repo: lwthiker/curl-impersonate
+    incl:
+      - x86_64-linux-gnu
+      - tar.gz
+    excl:
+      - libcurl
+    inst:
+      - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.name }}-ff" "{{ tool.name }}-chrome" curl_chrome101 curl_edge101 curl_ff100
+      - mv "{{ tool.bin_dir }}/curl_chrome101" "{{ tool.bin_dir }}/curl-ch"
+      - mv "{{ tool.bin_dir }}/curl_edge101" "{{ tool.bin_dir }}/curl-ed"
+      - mv "{{ tool.bin_dir }}/curl_ff100" "{{ tool.bin_dir }}/curl-fx"
+    ver:
+      name: "{{ tool.name }}-ff -V"
+      regex: 'curl (.*) \('
+  # - name: btop
+  #   type: git
+  #   repo: aristocratos/btop
+  #   incl:
+  #     - x86_64-linux-musl
+  #     - tbz
+  #   inst:
+  #     - mkdir -p "$HOME/.config/{{ tool.name }}"
+  #     - tar --strip-components=1 -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "bin/{{ tool.name }}"
+  #     - tar -C "$HOME/.config/{{ tool.name }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" themes
+  - name: govc
+    type: git
+    repo: vmware/govmomi
+    incl:
+      - govc_Linux_x86_64
+      - tar.gz
+    inst:
+      - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.name }}"
+    ver:
+      name: "{{ tool.name }} version"
+      regex: 'govc (.*)'
+  - name: kubectl-iexec
+    type: git
+    repo: gabeduke/kubectl-iexec
+    incl:
+      - Linux_x86_64
+      - tar.gz
+    inst:
+      - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.name }}"
+    ver:
+      type:
+  - name: helm
+    type: git
+    repo: helm/helm
+    url: "https://get.helm.sh/helm-v{{ tool.v_remote }}-linux-amd64.tar.gz"
+    ver:
+      name: "{{ tool.name }} version"
+      regex: 'Version:"v(\d.*?)"'
+    inst:
+      - tar --strip-components=1 -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" --wildcards --no-anchored "*/{{ tool.name }}"
+  - name: ventoy
+    type: git
+    repo: ventoy/Ventoy
+    incl:
+      - linux
+      - tar.gz
+    inst:
+      - tar --strip-components=2 -C "{{ tool.opt_dir }}/{{ tool.name }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}"
+    ver:
+      type: file
+      name: "{{ tool.opt_dir }}/{{ tool.name }}/{{ tool.name }}/version"
+  - name: k9s
+    type: git
+    repo: derailed/k9s
+    incl:
+      - Linux_x86_64
+      - tar.gz
+    inst:
+      - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.name }}"
+    ver:
+      name: "{{ tool.name }} version -s"
+  - name: storageexplorer
+    type: git
+    repo: microsoft/AzureStorageExplorer
+    incl:
+      - Linux_StorageExplorer
+      - tar.gz
+    inst:
+      - tar -C "{{ tool.opt_dir }}/{{ tool.name }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}"
+    ver:
+      type: file
+      name: "{{ tool.opt_dir }}/{{ tool.name }}/resources/app/package.json"
+      regex: '^  "version": "(.*?)"'
+  - name: ytcast
+    type: git
+    repo: MarcoLucidi01/ytcast
+    incl:
+      - linux-amd64
+      - tar.gz
+    inst:
+      - tar --strip-components=1 -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" --wildcards --no-anchored "*/{{ tool.name }}"
+    ver:
+      name: "{{ tool.name }} -v"
+  - name: viu
+    type: git
+    repo: atanunq/viu
+    incl:
+      - viu
+    excl:
+      - asc
+      - '-'
+    inst:
+      - install "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.bin_dir }}/{{ tool.name }}"
+  - name: awscli
+    type: git
+    repo: aws/aws-cli
+    look_up: tags
+    tag: "^2."
+    url: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+    inst:
+      - unzip "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" -d "{{ tool.tmp_dir }}/"
+      - '"{{ tool.tmp_dir }}/aws/install" -i "{{ tool.opt_dir }}/aws-cli" -b "{{ tool.bin_dir }}" --update'
+      - rm -rf "{{ tool.tmp_dir }}/aws*"
+    ver:
+      name: "aws --version"
+      regex: 'aws-cli/(.*?) '
+  - name: azcopy
+    type: git
+    repo: Azure/azure-storage-azcopy
+    url: https://aka.ms/downloadazcopy-v10-linux
+    package: "azcopy_linux_amd64_{{ tool.v_remote.strip('v') }}.tar.gz"
+    inst:
+      - tar --strip-components=1 -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" --wildcards --no-anchored "*/{{ tool.name }}"
+    ver:
+      regex: 'azcopy version (\d.*)'
+
+  - name: azuredatastudio
+    type: git
+    repo: microsoft/azuredatastudio
+    custom: yes
+    package: "azuredatastudio-linux-{{ tool.v_remote.strip('v') }}.rpm"
+
+  - name: zoom
+    type: direct
+    url: https://zoom.us/client/latest/zoom_x86_64.rpm
+  - name: minikube
+    type: direct
+    url: https://storage.googleapis.com/minikube/releases/latest/minikube-latest.x86_64.rpm
+  - name: dbeaver
+    type: direct
+    url: https://dbeaver.io/files/dbeaver-ce-latest-stable.x86_64.rpm
+
+  - name: postman
+    type: custom
+    url: https://dl.pstmn.io/download/latest/linux64
+    inst:
+      - tar -C "{{ tool.opt_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}"
+    ver:
+      type: file
+      name: "{{ tool.opt_dir }}/Postman/app/resources/app/package.json"
+      regex: '^  "version": "(.*?)"'
+  - name: icaclient
+    type: custom
+    url: https://www.citrix.com/downloads/workspace-app/linux/workspace-app-for-linux-latest.html
