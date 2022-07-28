@@ -166,6 +166,7 @@ tools:
     excl:
       - asc
     inst:
+      - mkdir -p "{{ tool.opt_dir }}/{{ tool.name }}"
       - tar --strip-components=1 -C "{{ tool.opt_dir }}/{{ tool.name }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}"
     ver:
       type: file
@@ -197,16 +198,6 @@ tools:
     ver:
       name: "{{ tool.name }}-ff -V"
       regex: 'curl (.*) \('
-  # - name: btop
-  #   type: git
-  #   repo: aristocratos/btop
-  #   incl:
-  #     - x86_64-linux-musl
-  #     - tbz
-  #   inst:
-  #     - mkdir -p "$HOME/.config/{{ tool.name }}"
-  #     - tar --strip-components=1 -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "bin/{{ tool.name }}"
-  #     - tar -C "$HOME/.config/{{ tool.name }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" themes
   - name: govc
     type: git
     repo: vmware/govmomi
@@ -244,6 +235,7 @@ tools:
       - linux
       - tar.gz
     inst:
+      - mkdir -p "{{ tool.opt_dir }}/{{ tool.name }}"
       - tar --strip-components=2 -C "{{ tool.opt_dir }}/{{ tool.name }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}"
     ver:
       type: file

@@ -19,19 +19,19 @@ it as specified in the configuration file.
 
 ## Prerequisites
 
-Should be working with Python 3.6+ (although not tested with versions older than
-3.10), with additional libraries:
+Should be working with Python 3.8+, with additional libraries:
 
 - jinja2
 - pyyaml
 - requests
 
-that can be installed via `pip install -r requirements.txt`.
+that can be installed via `pip install --user -r requirements.txt`.
 
 As for other dependencies:
 
 - any tool being used in the configuration file should be installed
 - any directory being used in the configuration file should exist
+- proper permissions for any command executed from configuration file
 - createrepo - installed if managing rpm files
 - local repository configured in dnf, e.g.:
 

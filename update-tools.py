@@ -65,7 +65,8 @@ class Tool:
                     print(f"       Remote file size: {remote_size}")
             else:
                 remote_dt = datetime.strptime(
-                    r.headers.get("Date"), "%a, %d %b %Y %H:%M:%S %Z"
+                    r.headers.get("Last-Modified", r.headers.get("Date")),
+                    "%a, %d %b %Y %H:%M:%S %Z",
                 )
                 local_dt = datetime.fromtimestamp(
                     int(os.path.getmtime(os.path.join(self.pkg_dir, self.pkg_name)))
@@ -177,7 +178,8 @@ class Tool:
             if fp := glob.glob(os.path.expandvars(file_name)):
                 file_path = max(fp, key=lambda f: os.stat(f).st_ctime)
             else:
-                raise RuntimeError(f"File '{file_name}' not found!")
+                self._errors.append(f"File '{file_name}' not found")
+                return
 
             if rx := self.ver.get("regex"):
                 if m := re.search(rx, file_path):
@@ -228,6 +230,7 @@ class ToolGit(Tool):
         self.pkg_dir = os.path.expandvars(tool_def.get("plg_dir", defaults["pkg_dir"]))
         self.__env_token_name = defaults["git"]["token_env"]
 
+        self._errors = []
         self._get_data_remote()
         self._get_data_local()
 
@@ -329,6 +332,7 @@ class ToolDirect(Tool):
         self.tmp_dir = os.path.expandvars(tool_def.get("tmp_dir", defaults["tmp_dir"]))
         self.pkg_dir = os.path.expandvars(tool_def.get("plg_dir", defaults["pkg_dir"]))
 
+        self._errors = []
         self._get_data_remote()
         self._get_data_local()
 
@@ -380,6 +384,8 @@ class ToolCustom(Tool):
         getattr(self, f"_get_data_{self.name}")()
         if "rpm" in self.pkg_name:
             self.is_rpm = True
+
+        self._errors = []
         self._get_data_local()
 
     @classmethod
@@ -609,7 +615,7 @@ def main():
 
         rpms_dl = False
         errors_list = []
-        for tool_def in tools:
+        for tool_def in sorted(tools, key=lambda item: item["name"]):
             try:
                 if tool_def.get("type") == "git":
                     tool = ToolGit(tool_def, defaults)
@@ -617,6 +623,9 @@ def main():
                     tool = ToolDirect(tool_def, defaults)
                 else:
                     tool = ToolCustom(tool_def, defaults)
+
+                for error in tool._errors:
+                    errors_list.append((tool.name, error))
 
                 if args.update:
                     tool.update(
@@ -631,7 +640,7 @@ def main():
                 else:
                     tool.check(verbose=args.verbose, skip=args.skip_current)
             except Exception as e:
-                errors_list.append((tool_def["name"], e))
+                errors_list.append((tool.name, e))
 
         if rpms_dl:
             if args.verbose >= 2:
