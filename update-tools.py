@@ -314,6 +314,7 @@ class ToolGit(Tool):
 
 class ToolDirect(Tool):
     def __init__(self, tool_def: dict, defaults: dict) -> None:
+        self.tool_def = tool_def
         self.name = tool_def["name"]
         self.url = self.pkg_url = tool_def["url"]
         self.package = tool_def.get("package")
@@ -358,6 +359,7 @@ class ToolDirect(Tool):
 
 class ToolCustom(Tool):
     def __init__(self, tool_def: dict, defaults: dict) -> None:
+        self.tool_def = tool_def
         self.name = tool_def["name"]
         self.url = self.pkg_url = tool_def["url"]
         self.package = tool_def.get("package")
@@ -408,8 +410,13 @@ class ToolCustom(Tool):
 
     def _get_data_azuredatastudio(self) -> None:
         r = requests.get(self.url)
-        m = re.search(R"\[linux-rpm\]: (.*)\r", json.loads(r.content.decode())["body"])
-        self.pkg_url = m.groups()[0]
+        if m := re.search(
+            R"\[linux-rpm\]: (.*)\r", json.loads(r.content.decode())["body"]
+        ):
+            self.pkg_url = m.groups()[0]
+        else:
+            self.pkg_url = None
+
         if not self.package:
             self.pkg_name = self.pkg_url.split("/")[-1]
         else:
@@ -420,26 +427,39 @@ class ToolCustom(Tool):
         self.pkg_url = self.url
 
         r = requests.get(self.pkg_url, stream=True)
-        m = re.search(R".*filename=(.*)", r.headers["Content-Disposition"])
-        self.pkg_name = m.groups()[0]
+        if m := re.search(R".*filename=(.*)", r.headers["Content-Disposition"]):
+            self.pkg_name = m.groups()[0]
+        else:
+            self.pkg_name = None
 
-        m = re.search(R".*postman-(.*)-linux", self.pkg_name)
-        self.v_remote = m.groups()[0]
+        r = requests.get("https://www.postman.com/mkapi/release.json")
+        if r.ok:
+            self.v_remote = json.loads(r.content)["notes"][0]["version"]
+        else:
+            self.v_remote = None
 
     def _get_data_icaclient(self) -> None:
         r = requests.get(self.url)
-        m = re.search(R'rel="(.*ICAClient-rhel.*x86_64.rpm.*?)"', r.content.decode())
-        self.pkg_url = f"http:{m.groups()[0]}"
+        if m := re.search(
+            R'rel="(.*ICAClient-rhel.*x86_64.rpm.*?)"', r.content.decode()
+        ):
+            self.pkg_url = f"http:{m.groups()[0]}"
+        else:
+            self.pkg_url = None
 
-        m = re.search(R"ICAClient.*rpm", self.pkg_url)
-        self.pkg_name = m.group()
+        if m := re.search(R"ICAClient.*rpm", self.pkg_url):
+            self.pkg_name = m.group()
+        else:
+            self.pkg_name = None
 
-        m = re.search(R"rhel-(.*)-", self.pkg_name)
-        self.v_remote = m.groups()[0]
+        if m := re.search(R"rhel-(.*)-", self.pkg_name):
+            self.v_remote = m.groups()[0]
+        else:
+            self.v_remote = None
 
 
 def version_mismatch(v_remote: str, v_local: str) -> bool:
-    if v_local is None:
+    if v_local is None or v_remote is None:
         return False
     else:
         if v_local in v_remote or v_remote in v_local:
