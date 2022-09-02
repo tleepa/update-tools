@@ -34,7 +34,7 @@ class Tool:
                 print(f"    {self.name}")
                 print_details = True
         if verbose >= 2:
-            print_info(self)
+            print_info(self, verbose)
 
         if print_details and verbose >= 1:
             print(f"           remote name: {self.pkg_name}")
@@ -109,10 +109,10 @@ class Tool:
             if not skip:
                 print(f"    {self.name}")
         if update and verbose >= 2:
-            print(f"       Updating: {self.pkg_name}")
+            print(f"        Updating: {self.pkg_name}")
         elif verbose >= 2:
-            print(f"       Not updating: {self.pkg_name}")
-            print(f"       RPM package: {self.is_rpm}")
+            print(f"        Not updating: {self.pkg_name}")
+            print(f"        RPM package: {self.is_rpm}")
 
         if update:
             for count, step in enumerate(self.inst, start=1):
@@ -364,7 +364,10 @@ class ToolCustom(Tool):
         self.url = self.pkg_url = tool_def["url"]
         self.package = tool_def.get("package")
         self.inst = tool_def.get("inst", [])
-        self.ver = tool_def.get("ver")
+        self.ver = defaults["ver"].copy()
+        if tool_def.get("ver"):
+            for (key, value) in tool_def.get("ver").items():
+                self.ver[key] = value
         self.is_rpm = False
         self.v_local = tool_def.get("v_local")
         self.v_remote = tool_def.get("v_remote")
@@ -422,6 +425,20 @@ class ToolCustom(Tool):
         else:
             tm = Template(self.package)
             self.pkg_name = tm.render(tool=self)
+
+    def _get_data_usbimager(self) -> None:
+        r = requests.get(self.url)
+        if m := re.search(
+            R"Linux PC.*?\[GTK\+\]\((.*?" + self.package + ")\)", r.content.decode()
+        ):
+            self.pkg_url = m.groups()[0]
+            self.pkg_name = self.pkg_url.split("/")[-1]
+            self.v_remote = re.search(
+                R"usbimager_(.*?)" + self.package, self.pkg_name
+            ).groups()[0]
+        else:
+            self.pkg_url = None
+            self.pkg_name = None
 
     def _get_data_postman(self) -> None:
         self.pkg_url = self.url
@@ -487,11 +504,15 @@ def download_file(url: str, dest_folder: str, file_name=None) -> bool:
         return False
 
 
-def print_info(tool: Tool) -> None:
+def print_info(tool: Tool, verbose) -> None:
     indent = " " * 4
     print(indent * 2, "Tool definition:")
     for line in yaml.dump(
-        tool.tool_def, default_flow_style=False, sort_keys=False, indent=4, width=1000
+        tool.tool_def,
+        default_flow_style=False,
+        sort_keys=False,
+        indent=4,
+        width=1000,
     ).split("\n"):
         print(indent * 3, line)
     print("")
@@ -509,6 +530,22 @@ def print_info(tool: Tool) -> None:
     for line in tm.render(tool=tool).split("\n"):
         print(indent * 3, line)
     print("")
+
+    if verbose >= 3:
+        print(indent * 2, "Tool object attributes (rendered):")
+        tm = Template(
+            yaml.safe_dump(
+                json.loads(json.dumps(vars(tool))),
+                default_flow_style=False,
+                sort_keys=False,
+                indent=4,
+                width=1000,
+            )
+        )
+        for line in tm.render(tool=tool).split("\n"):
+            print(indent * 3, line)
+        print("")
+
     print("")
 
 
@@ -586,19 +623,26 @@ def main():
                 "regex": None,
             },
             "git": {
-                "tag": "latest",
                 "look_up": "releases",
-                "assets": "yes",
+                "tag": "latest",
+                "custom": "no",
                 "token_env": "GITHUB_TOKEN",
             },
         }
         defaults = data_loaded.get("defaults", {})
 
         for key in defaults_dict.keys():
-            try:
-                defaults[key] = defaults[key]
-            except KeyError:
-                defaults[key] = defaults_dict[key]
+            if not type(defaults_dict[key]) is dict:
+                try:
+                    defaults[key] = defaults[key]
+                except KeyError:
+                    defaults[key] = defaults_dict[key]
+            else:
+                for subkey in defaults_dict[key].keys():
+                    try:
+                        defaults[key][subkey] = defaults[key][subkey]
+                    except KeyError:
+                        defaults[key][subkey] = defaults_dict[key][subkey]
 
         if args.verbose >= 2:
             print("Defaults:")
@@ -636,6 +680,7 @@ def main():
         rpms_dl = False
         errors_list = []
         for tool_def in sorted(tools, key=lambda item: item["name"]):
+            tool = None
             try:
                 if tool_def.get("type") == "git":
                     tool = ToolGit(tool_def, defaults)

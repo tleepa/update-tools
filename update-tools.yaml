@@ -357,3 +357,9 @@ tools:
   - name: icaclient
     type: custom
     url: https://www.citrix.com/downloads/workspace-app/linux/workspace-app-for-linux-latest.html
+  - name: usbimager
+    type: custom
+    url: https://gitlab.com/bztsrc/usbimager/raw/master/README.md
+    package: "-x86_64-linux-gtk.zip"
+    inst:
+      - sudo unzip -o "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" -d /usr
