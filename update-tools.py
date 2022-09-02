@@ -201,6 +201,7 @@ class Tool:
 class ToolGit(Tool):
     def __init__(self, tool_def: dict, defaults: dict) -> None:
         self.tool_def = tool_def
+        self.defaults = defaults
         self.name = tool_def["name"]
         self.repo = tool_def["repo"]
         self.look_up = tool_def.get("look_up", defaults["git"]["look_up"])
@@ -409,7 +410,7 @@ class ToolCustom(Tool):
             "tmp_dir": tool.tmp_dir,
             "pkg_dir": tool.pkg_dir,
         }
-        return cls(custom_dict, {})
+        return cls(custom_dict, tool.defaults)
 
     def _get_data_azuredatastudio(self) -> None:
         r = requests.get(self.url)
@@ -690,7 +691,7 @@ def main():
                     tool = ToolCustom(tool_def, defaults)
 
                 for error in tool._errors:
-                    errors_list.append((tool.name, error))
+                    errors_list.append((tool_def["name"], error))
 
                 if args.update:
                     tool.update(
@@ -705,7 +706,7 @@ def main():
                 else:
                     tool.check(verbose=args.verbose, skip=args.skip_current)
             except Exception as e:
-                errors_list.append((tool.name, e))
+                errors_list.append((tool_def["name"], e))
 
         if rpms_dl:
             if args.verbose >= 2:
