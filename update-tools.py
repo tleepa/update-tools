@@ -356,6 +356,11 @@ class ToolDirect(Tool):
                 capture_output=True,
                 encoding="UTF-8",
             ).stdout.strip("\n")
+        elif ver_remote := self.tool_def.get("ver_remote"):
+            r = requests.get(url=ver_remote["url"])
+            self.v_remote = re.search(ver_remote["regex"], r.content.decode()).groups()[
+                0
+            ]
 
 
 class ToolCustom(Tool):

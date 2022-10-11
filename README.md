@@ -156,6 +156,9 @@ If `type` is `direct`:
 
 - `url` - where to download package from
 - `package` - name of the local file when downloading the package
+- `ver_remote` - dictionary to find version of the tool:
+  - `url` - what page to search for the version
+  - `regex` - regular expression to extract the version
 
 #### Templating
 

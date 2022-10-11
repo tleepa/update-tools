@@ -386,6 +386,9 @@ tools:
     url: https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
     inst:
       - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}"
+    ver_remote:
+      url: https://ngrok.com/docs/ngrok-agent/changelog
+      regex: 'ngrok Agent ([\d\.]+)'
   - name: zoom
     type: direct
     url: https://zoom.us/client/latest/zoom_x86_64.rpm
