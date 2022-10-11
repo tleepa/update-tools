@@ -115,14 +115,6 @@ tools:
     excl:
       - pem
       - sig
-  - name: gitui
-    type: git
-    repo: extrawurst/gitui
-    incl:
-      - linux
-      - tar.gz
-    inst:
-      - tar --strip-components=1 -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" --wildcards --no-anchored "*/{{ tool.name }}"
   - name: terrascan
     type: git
     repo: tenable/terrascan
@@ -134,16 +126,6 @@ tools:
     ver:
       name: "{{ tool.name }} version"
       regex: ' v(\d.*)'
-  - name: delta
-    type: git
-    repo: dandavison/delta
-    incl:
-      - x86_64-unknown-linux-gnu
-      - tar.gz
-    inst:
-      - tar --strip-components=1 -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" --wildcards --no-anchored "*/{{ tool.name }}"
-    ver:
-      regex: ' (\d.*)'
   - name: terraform-docs
     type: git
     repo: terraform-docs/terraform-docs
