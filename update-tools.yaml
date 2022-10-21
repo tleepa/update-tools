@@ -196,18 +196,6 @@ tools:
       - rpm
     ver:
       file:
-  - name: podman-desktop-companion
-    type: git
-    repo: iongion/podman-desktop-companion
-    tag: 4.1.0-rc.28
-    incl:
-      - x86_64
-      - flatpak
-    inst:
-      - flatpak install --or-update -y --bundle "{{ tool.pkg_dir }}/{{ tool.pkg_name }}"
-    ver:
-      cmd: flatpak info io.github.iongion.PodmanDesktopCompanion
-      regex: 'Version: (.*)'
   - name: pdfsam
     type: git
     repo: torakiki/pdfsam
