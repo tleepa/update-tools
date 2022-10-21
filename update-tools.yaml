@@ -3,7 +3,7 @@ defaults:
   bin_dir: $HOME/bin
   opt_dir: /opt
   tmp_dir: /tmp
-  pkg_dir: $HOME/Repos/packages
+  pkg_dir: /opt/_packages
   ver:
     type: cmd
     name: "{{ tool.name }} --version"
