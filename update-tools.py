@@ -5,11 +5,13 @@ from jinja2 import Template
 
 import argparse
 import glob
+import gzip
 import json
 import os
 import re
 import requests
 import shlex
+import shutil
 import subprocess
 import sys
 import urllib.parse
@@ -102,7 +104,11 @@ class Tool:
             update = True
             if verbose >= 2:
                 print("        Update forced")
-        elif not self.is_rpm and version_mismatch(self.v_remote, self.v_local):
+        elif (
+            not self.is_rpm
+            and not self.is_deb
+            and version_mismatch(self.v_remote, self.v_local)
+        ):
             print(f"{Color.YLW}    {self.name}{Color.RST}")
             update = True
         else:
@@ -113,6 +119,7 @@ class Tool:
         elif verbose >= 2:
             print(f"        Not updating: {self.pkg_name}")
             print(f"        RPM package: {self.is_rpm}")
+            print(f"        DEB package: {self.is_deb}")
 
         if update:
             for count, step in enumerate(self.inst, start=1):
@@ -151,18 +158,29 @@ class Tool:
             ).stdout.strip("\n")
             if not "not installed" in ver:
                 self.v_local = ver
+        elif self.pkg_local and self.is_deb:
+            deb_info = subprocess.run(
+                shlex.split(f"dpkg -I {os.path.join(self.pkg_dir, self.pkg_local[0])}"),
+                capture_output=True,
+                encoding="UTF-8",
+            ).stdout.strip("\n")
+            ver_lines = [line for line in deb_info.split("\n") if "Version" in line]
+            if ver_lines:
+                ver = ver_lines[0].split(":")[1].strip()
+            if not "not installed" in ver:
+                self.v_local = ver
         elif self.ver.get("type") == "cmd":
             ver_cmd = self.ver.get("name")
             tm = Template(ver_cmd)
             cmd = tm.render(tool=self)
-            if not subprocess.run(
-                ["command", "-v", shlex.split(cmd)[0]],
-                capture_output=True,
-                encoding="UTF-8",
-            ).returncode:
-                ver = subprocess.run(
-                    shlex.split(cmd), capture_output=True, encoding="UTF-8"
-                ).stdout.strip("\n")
+            if shutil.which(shlex.split(cmd)[0]):
+                ver = re.sub(
+                    R"\x1b\[\d+m",
+                    "",
+                    subprocess.run(
+                        shlex.split(cmd), capture_output=True, encoding="UTF-8"
+                    ).stdout,
+                ).strip("\n")
                 if rx := self.ver.get("regex"):
                     if m := re.search(rx, ver):
                         if m.groups():
@@ -222,6 +240,7 @@ class ToolGit(Tool):
             for (key, value) in tool_def.get("ver").items():
                 self.ver[key] = value
         self.is_rpm = False
+        self.is_deb = False
         self.dl_ok = False
         self.v_local = None
 
@@ -309,8 +328,11 @@ class ToolGit(Tool):
             self.pkg_url = custom_tool.pkg_url
             self.pkg_name = custom_tool.pkg_name
 
-        if "rpm" in self.pkg_name:
+        if self.pkg_name.endswith("rpm"):
             self.is_rpm = True
+
+        if self.pkg_name.endswith("deb"):
+            self.is_deb = True
 
 
 class ToolDirect(Tool):
@@ -325,6 +347,7 @@ class ToolDirect(Tool):
             for (key, value) in tool_def.get("ver").items():
                 self.ver[key] = value
         self.is_rpm = False
+        self.is_deb = False
         self.v_local = None
         self.v_remote = None
         self.dl_ok = False
@@ -349,13 +372,26 @@ class ToolDirect(Tool):
             tm = Template(self.package)
             self.pkg_name = tm.render(tool=self)
 
-        if "rpm" in self.pkg_name:
+        if self.pkg_name.endswith("rpm"):
             self.is_rpm = True
             self.v_remote = subprocess.run(
                 shlex.split(f"rpm --qf '%{{VERSION}}' -qp {self.pkg_url}"),
                 capture_output=True,
                 encoding="UTF-8",
             ).stdout.strip("\n")
+        elif self.pkg_name.endswith("deb"):
+            self.is_deb = True
+            if download_file(self.pkg_url, self.tmp_dir, self.pkg_name):
+                deb_info = subprocess.run(
+                    shlex.split(f"dpkg -I {os.path.join(self.tmp_dir, self.pkg_name)}"),
+                    capture_output=True,
+                    encoding="UTF-8",
+                ).stdout.strip("\n")
+                os.remove(os.path.join(self.tmp_dir, self.pkg_name))
+                ver_lines = [line for line in deb_info.split("\n") if "Version" in line]
+                if ver_lines:
+                    ver = ver_lines[0].split(":")[1].strip()
+                    self.v_remote = ver
         elif ver_remote := self.tool_def.get("ver_remote"):
             r = requests.get(url=ver_remote["url"])
             self.v_remote = re.search(ver_remote["regex"], r.content.decode()).groups()[
@@ -375,6 +411,7 @@ class ToolCustom(Tool):
             for (key, value) in tool_def.get("ver").items():
                 self.ver[key] = value
         self.is_rpm = False
+        self.is_deb = False
         self.v_local = tool_def.get("v_local")
         self.v_remote = tool_def.get("v_remote")
         self.dl_ok = False
@@ -393,8 +430,10 @@ class ToolCustom(Tool):
         )
 
         getattr(self, f"_get_data_{self.name}")()
-        if "rpm" in self.pkg_name:
+        if self.pkg_name.endswith("rpm"):
             self.is_rpm = True
+        if self.pkg_name.endswith("deb"):
+            self.is_deb = True
 
         self._errors = []
         self._get_data_local()
@@ -556,13 +595,27 @@ def print_info(tool: Tool, verbose) -> None:
 
 
 def update_repo(repo_path):
-    cmd = subprocess.run(
+    rpm_cmd = subprocess.run(
         shlex.split(f"createrepo '{os.path.expandvars(repo_path)}'"),
         capture_output=True,
         encoding="UTF-8",
     )
-    if cmd.returncode:
-        raise RuntimeError(f"Failed to update repo in {repo_path}")
+    if rpm_cmd.returncode:
+        raise RuntimeError(f"Failed to update RPM repo in {repo_path}")
+
+    deb_cmd = subprocess.run(
+        shlex.split(f"dpkg-scanpackages -m ."),
+        cwd=os.path.expandvars(repo_path),
+        capture_output=True,
+    )
+    if deb_cmd.returncode:
+        raise RuntimeError(f"Failed to generate Packages from {repo_path}")
+    else:
+        try:
+            with gzip.open(os.path.join(repo_path, "Packages.gz"), "wb") as f:
+                f.write(deb_cmd.stdout)
+        except Exception as e:
+            raise e
 
 
 def main():
@@ -683,7 +736,7 @@ def main():
                 print(f"    {tool['name']}")
             print("")
 
-        rpms_dl = False
+        tools_dld = False
         errors_list = []
         for tool_def in sorted(tools, key=lambda item: item["name"]):
             tool = None
@@ -706,14 +759,14 @@ def main():
                     tool.download(
                         verbose=args.verbose, force=args.force, skip=args.skip_current
                     )
-                    if tool.is_rpm and tool.dl_ok:
-                        rpms_dl = True
+                    if (tool.is_rpm or tool.is_deb) and tool.dl_ok:
+                        tools_dld = True
                 else:
                     tool.check(verbose=args.verbose, skip=args.skip_current)
             except Exception as e:
                 errors_list.append((tool_def["name"], e))
 
-        if rpms_dl:
+        if tools_dld:
             if args.verbose >= 2:
                 print("")
                 print(f"Updating repo: {os.path.expandvars(defaults['pkg_dir'])}")

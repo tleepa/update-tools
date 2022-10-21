@@ -1,0 +1,25 @@
+---
+defaults:
+  bin_dir: $HOME/bin
+  opt_dir: /opt
+  tmp_dir: /tmp
+  pkg_dir: /opt/_packages
+  ver:
+    type: cmd
+    name: "{{ tool.name }} --version"
+    regex: '\d.*'
+  git:
+    look_up: releases
+    tag: latest
+    custom: no
+    token_env: GITHUB_TOKEN
+
+tools:
+  - name: delta
+    type: git
+    repo: dandavison/delta
+    incl:
+      - amd64
+      - deb
+    excl:
+      - musl

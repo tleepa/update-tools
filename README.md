@@ -14,6 +14,9 @@ holds definition of the tools to manage.
 If the tool is an rpm package, the script can donwload it and create/refresh
 local rpm repository. This repository needs to be added to dnf configuration.
 
+If the tool is a deb package, the script can donwload it and create/refresh
+local apt repository. This source needs to be added to apr sources list.
+
 If the tool is a binary or an archive, the script can download and install/update
 it as specified in the configuration file.
 
@@ -33,7 +36,8 @@ As for other dependencies:
 - any directory being used in the configuration file should exist
 - proper permissions for any command executed from configuration file
 - createrepo - installed if managing rpm files
-- local repository configured in dnf, e.g.:
+- dpkg-dev - installed if managing deb files
+- for rpm packages: local repository configured in dnf, e.g.:
 
   ```ini
   ❯ cat /etc/yum.repos.d/local.repo
@@ -42,6 +46,13 @@ As for other dependencies:
   baseurl=file:///<path to directory with packages>
   enabled=1
   gpgcheck=0
+  ```
+
+- for deb packages: local repository configured in apt, e.g.:
+
+  ```ini
+  ❯ cat /etc/apt/sources.list.d/local.list
+  deb [trusted=yes] file:///<path to directory with packages> /
   ```
 
 ## Usage
