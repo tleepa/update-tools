@@ -1,5 +1,6 @@
 #! /usr/bin/env python3
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from jinja2 import Template
 
@@ -29,32 +30,32 @@ class Tool:
     def check(self, verbose, skip=False) -> None:
         print_details = False
         if version_mismatch(self.v_remote, self.v_local):
-            print(f"{Color.YLW}    {self.name}{Color.RST}")
+            self._outputs.append(f"{Color.YLW}    {self.name}{Color.RST}")
             print_details = True
         else:
             if not skip:
-                print(f"    {self.name}")
+                self._outputs.append(f"    {self.name}")
                 print_details = True
         if verbose >= 2:
             print_info(self, verbose)
 
         if print_details and verbose >= 1:
-            print(f"           remote name: {self.pkg_name}")
-            print(f"            remote url: {self.pkg_url}")
-            print(f"        remote version: {self.v_remote}")
-            print(f"         local version: {self.v_local}")
-            print(f"        local packages: {self.pkg_local}")
+            self._outputs.append(f"           remote name: {self.pkg_name}")
+            self._outputs.append(f"            remote url: {self.pkg_url}")
+            self._outputs.append(f"        remote version: {self.v_remote}")
+            self._outputs.append(f"         local version: {self.v_local}")
+            self._outputs.append(f"        local packages: {self.pkg_local}")
 
     def download(self, verbose, force=False, skip=False) -> None:
         dl = False
         if force:
             dl = True
             if verbose >= 2:
-                print("        Download forced")
+                self._outputs.append("        Download forced")
         elif not os.path.exists(os.path.join(self.pkg_dir, self.pkg_name)):
             dl = True
             if verbose >= 2:
-                print("        Local file does not exist")
+                self._outputs.append("        Local file does not exist")
         else:
             r = requests.get(self.pkg_url, stream=True)
             remote_size = int(r.headers.get("Content-Length"))
@@ -62,9 +63,11 @@ class Tool:
             if remote_size != local_size:
                 dl = True
                 if verbose >= 2:
-                    print("        Local file exists but has different size")
-                    print(f"        Local file size: {local_size}")
-                    print(f"       Remote file size: {remote_size}")
+                    self._outputs.append(
+                        "        Local file exists but has different size"
+                    )
+                    self._outputs.append(f"        Local file size: {local_size}")
+                    self._outputs.append(f"       Remote file size: {remote_size}")
             else:
                 remote_dt = datetime.strptime(
                     r.headers.get("Last-Modified", r.headers.get("Date")),
@@ -76,144 +79,157 @@ class Tool:
                 if remote_dt > local_dt:
                     dl = True
                     if verbose >= 2:
-                        print("        Local file exists but is older")
-                        print(f"        Local file date: {local_dt}")
-                        print(f"       Remote file date: {remote_dt}")
+                        self._outputs.append("        Local file exists but is older")
+                        self._outputs.append(f"        Local file date: {local_dt}")
+                        self._outputs.append(f"       Remote file date: {remote_dt}")
 
         if dl:
-            print(f"{Color.YLW}    {self.name}{Color.RST}")
+            self._outputs.append(f"{Color.YLW}    {self.name}{Color.RST}")
             if verbose >= 2:
-                print(f"        Downloading package {self.pkg_name}")
+                self._outputs.append(f"        Downloading package {self.pkg_name}")
             if download_file(self.pkg_url, self.pkg_dir, self.pkg_name):
                 if verbose >= 1:
-                    print(f"        Downloaded {self.pkg_name}")
+                    self._outputs.append(f"        Downloaded {self.pkg_name}")
                 self.dl_ok = True
         elif not skip:
-            print(f"    {self.name}")
+            self._outputs.append(f"    {self.name}")
             if verbose >= 2:
-                print(f"        Not downloading package: {self.pkg_name}")
-                print(f"        Exisiting local packages: {self.pkg_local}")
-                print(f"        Local file size: {local_size}")
-                print(f"        Remote file size: {remote_size}")
-                print(f"        Local file date: {local_dt}")
-                print(f"        Remote file date: {remote_dt}")
+                self._outputs.append(
+                    f"        Not downloading package: {self.pkg_name}"
+                )
+                self._outputs.append(
+                    f"        Exisiting local packages: {self.pkg_local}"
+                )
+                self._outputs.append(f"        Local file size: {local_size}")
+                self._outputs.append(f"        Remote file size: {remote_size}")
+                self._outputs.append(f"        Local file date: {local_dt}")
+                self._outputs.append(f"        Remote file date: {remote_dt}")
 
     def update(self, verbose, force=False, skip=False) -> None:
         update = False
         if force:
             update = True
             if verbose >= 2:
-                print("        Update forced")
+                self._outputs.append("        Update forced")
         elif (
             not self.is_rpm
             and not self.is_deb
             and version_mismatch(self.v_remote, self.v_local)
         ):
-            print(f"{Color.YLW}    {self.name}{Color.RST}")
+            self._outputs.append(f"{Color.YLW}    {self.name}{Color.RST}")
             update = True
         else:
             if not skip:
-                print(f"    {self.name}")
+                self._outputs.append(f"    {self.name}")
         if update and verbose >= 2:
-            print(f"        Updating: {self.pkg_name}")
+            self._outputs.append(f"        Updating: {self.pkg_name}")
         elif verbose >= 2:
-            print(f"        Not updating: {self.pkg_name}")
-            print(f"        RPM package: {self.is_rpm}")
-            print(f"        DEB package: {self.is_deb}")
+            self._outputs.append(f"        Not updating: {self.pkg_name}")
+            self._outputs.append(f"        RPM package: {self.is_rpm}")
+            self._outputs.append(f"        DEB package: {self.is_deb}")
 
         if update:
             for count, step in enumerate(self.inst, start=1):
                 tm = Template(os.path.expandvars(step))
                 cmd = tm.render(tool=self)
                 if verbose >= 2:
-                    print(f"           Step {count}/{len(self.inst)}: {cmd}")
+                    self._outputs.append(
+                        f"           Step {count}/{len(self.inst)}: {cmd}"
+                    )
                 if not subprocess.run(
                     shlex.split(cmd), capture_output=True, encoding="UTF-8"
                 ).returncode:
                     if verbose >= 1:
-                        print(f"           Step {count}/{len(self.inst)}: completed.")
+                        self._outputs.append(
+                            f"           Step {count}/{len(self.inst)}: completed."
+                        )
                 else:
                     raise RuntimeError(
                         f"           Step {count}/{len(self.inst)}: failed."
                     )
 
     def _get_data_local(self) -> None:
-        files = list(os.scandir(os.path.realpath(os.path.expandvars(self.pkg_dir))))
-        self.pkg_local = [
-            file.name for file in files if self.name.lower() in file.name.lower()
-        ]
+        try:
+            files = list(os.scandir(os.path.realpath(os.path.expandvars(self.pkg_dir))))
+            self.pkg_local = [
+                file.name for file in files if self.name.lower() in file.name.lower()
+            ]
 
-        if self.pkg_local and self.is_rpm:
-            rpm_name = subprocess.run(
-                shlex.split(
-                    f"rpm --qf '%{{NAME}}' -qp {os.path.join(self.pkg_dir, self.pkg_local[0])}"
-                ),
-                capture_output=True,
-                encoding="UTF-8",
-            ).stdout.strip("\n")
-            ver = subprocess.run(
-                shlex.split(f"rpm --qf '%{{VERSION}}' -q {rpm_name}"),
-                capture_output=True,
-                encoding="UTF-8",
-            ).stdout.strip("\n")
-            if not "not installed" in ver:
-                self.v_local = ver
-        elif self.pkg_local and self.is_deb:
-            deb_info = subprocess.run(
-                shlex.split(f"dpkg -I {os.path.join(self.pkg_dir, self.pkg_local[0])}"),
-                capture_output=True,
-                encoding="UTF-8",
-            ).stdout.strip("\n")
-            ver_lines = [line for line in deb_info.split("\n") if "Version" in line]
-            if ver_lines:
-                ver = ver_lines[0].split(":")[1].strip()
-            if not "not installed" in ver:
-                self.v_local = ver
-        elif self.ver.get("type") == "cmd":
-            ver_cmd = self.ver.get("name")
-            tm = Template(ver_cmd)
-            cmd = tm.render(tool=self)
-            if shutil.which(shlex.split(cmd)[0]):
-                ver = re.sub(
-                    R"\x1b\[\d+m",
-                    "",
-                    subprocess.run(
-                        shlex.split(cmd), capture_output=True, encoding="UTF-8"
-                    ).stdout,
-                ).strip("\n")
+            if self.pkg_local and self.is_rpm:
+                rpm_name = subprocess.run(
+                    shlex.split(
+                        f"rpm --qf '%{{NAME}}' -qp {os.path.join(self.pkg_dir, self.pkg_local[0])}"
+                    ),
+                    capture_output=True,
+                    encoding="UTF-8",
+                ).stdout.strip("\n")
+                ver = subprocess.run(
+                    shlex.split(f"rpm --qf '%{{VERSION}}' -q {rpm_name}"),
+                    capture_output=True,
+                    encoding="UTF-8",
+                ).stdout.strip("\n")
+                if not "not installed" in ver:
+                    self.v_local = ver
+            elif self.pkg_local and self.is_deb:
+                deb_info = subprocess.run(
+                    shlex.split(
+                        f"dpkg -I {os.path.join(self.pkg_dir, self.pkg_local[0])}"
+                    ),
+                    capture_output=True,
+                    encoding="UTF-8",
+                ).stdout.strip("\n")
+                ver_lines = [line for line in deb_info.split("\n") if "Version" in line]
+                if ver_lines:
+                    ver = ver_lines[0].split(":")[1].strip()
+                if not "not installed" in ver:
+                    self.v_local = ver
+            elif self.ver.get("type") == "cmd":
+                ver_cmd = self.ver.get("name")
+                tm = Template(ver_cmd)
+                cmd = tm.render(tool=self)
+                if shutil.which(shlex.split(cmd)[0]):
+                    ver = re.sub(
+                        R"\x1b\[\d+m",
+                        "",
+                        subprocess.run(
+                            shlex.split(cmd), capture_output=True, encoding="UTF-8"
+                        ).stdout,
+                    ).strip("\n")
+                    if rx := self.ver.get("regex"):
+                        if m := re.search(rx, ver):
+                            if m.groups():
+                                self.v_local = m.groups()[0]
+                            elif m.group():
+                                self.v_local = m.group()
+                    else:
+                        self.v_local = ver.strip("v")
+            elif self.ver.get("type") == "file":
+                ver_file = self.ver.get("name")
+                tm = Template(ver_file)
+                file_name = tm.render(tool=self)
+                if fp := glob.glob(os.path.expandvars(file_name)):
+                    file_path = max(fp, key=lambda f: os.stat(f).st_ctime)
+                else:
+                    self._errors.append(f"File '{file_name}' not found")
+                    return
+
                 if rx := self.ver.get("regex"):
-                    if m := re.search(rx, ver):
+                    if m := re.search(rx, file_path):
                         if m.groups():
                             self.v_local = m.groups()[0]
                         elif m.group():
                             self.v_local = m.group()
-                else:
-                    self.v_local = ver.strip("v")
-        elif self.ver.get("type") == "file":
-            ver_file = self.ver.get("name")
-            tm = Template(ver_file)
-            file_name = tm.render(tool=self)
-            if fp := glob.glob(os.path.expandvars(file_name)):
-                file_path = max(fp, key=lambda f: os.stat(f).st_ctime)
-            else:
-                self._errors.append(f"File '{file_name}' not found")
-                return
-
-            if rx := self.ver.get("regex"):
-                if m := re.search(rx, file_path):
-                    if m.groups():
-                        self.v_local = m.groups()[0]
-                    elif m.group():
-                        self.v_local = m.group()
-                else:
-                    with open(file_path, "r") as f:
-                        file_lines = f.readlines()
-                    for line in file_lines:
-                        m = re.search(rx, line.strip("\n"))
-                        if m and m.groups():
-                            self.v_local = m.groups()[0]
-                        elif m and m.group():
-                            self.v_local = m.group()
+                    else:
+                        with open(file_path, "r") as f:
+                            file_lines = f.readlines()
+                        for line in file_lines:
+                            m = re.search(rx, line.strip("\n"))
+                            if m and m.groups():
+                                self.v_local = m.groups()[0]
+                            elif m and m.group():
+                                self.v_local = m.group()
+        except Exception as e:
+            self._errors.append(self.name, e)
 
 
 class ToolGit(Tool):
@@ -251,6 +267,7 @@ class ToolGit(Tool):
         self.__env_token_name = defaults["git"]["token_env"]
 
         self._errors = []
+        self._outputs = []
         self._get_data_remote()
         self._get_data_local()
 
@@ -358,6 +375,7 @@ class ToolDirect(Tool):
         self.pkg_dir = os.path.expandvars(tool_def.get("plg_dir", defaults["pkg_dir"]))
 
         self._errors = []
+        self._outputs = []
         self._get_data_remote()
         self._get_data_local()
 
@@ -436,6 +454,7 @@ class ToolCustom(Tool):
             self.is_deb = True
 
         self._errors = []
+        self._outputs = []
         self._get_data_local()
 
     @classmethod
@@ -549,7 +568,7 @@ def download_file(url: str, dest_folder: str, file_name=None) -> bool:
         return False
 
 
-def print_info(tool: Tool, verbose) -> None:
+def print_info(tool: Tool, verbose: int) -> None:
     indent = " " * 4
     print(indent * 2, "Tool definition:")
     for line in yaml.dump(
@@ -594,7 +613,7 @@ def print_info(tool: Tool, verbose) -> None:
     print("")
 
 
-def update_repo(repo_path):
+def update_repo(repo_path: str) -> None:
     rpm_cmd = subprocess.run(
         shlex.split(f"createrepo '{os.path.expandvars(repo_path)}'"),
         capture_output=True,
@@ -616,6 +635,25 @@ def update_repo(repo_path):
                 f.write(deb_cmd.stdout)
         except Exception as e:
             raise e
+
+
+def process_tool(tool_def: dict, defaults: dict, args: argparse.Namespace) -> Tool:
+    tool = None
+    if tool_def.get("type") == "git":
+        tool = ToolGit(tool_def, defaults)
+    elif tool_def.get("type") == "direct":
+        tool = ToolDirect(tool_def, defaults)
+    else:
+        tool = ToolCustom(tool_def, defaults)
+
+    if args.update:
+        tool.update(verbose=args.verbose, force=args.force, skip=args.skip_current)
+    elif args.download:
+        tool.download(verbose=args.verbose, force=args.force, skip=args.skip_current)
+    else:
+        tool.check(verbose=args.verbose, skip=args.skip_current)
+
+    return tool
 
 
 def main():
@@ -738,33 +776,22 @@ def main():
 
         tools_dld = False
         errors_list = []
-        for tool_def in sorted(tools, key=lambda item: item["name"]):
-            tool = None
-            try:
-                if tool_def.get("type") == "git":
-                    tool = ToolGit(tool_def, defaults)
-                elif tool_def.get("type") == "direct":
-                    tool = ToolDirect(tool_def, defaults)
-                else:
-                    tool = ToolCustom(tool_def, defaults)
+        futures = []
+        with ThreadPoolExecutor() as executor:
+            for tool_def in sorted(tools, key=lambda item: item["name"]):
+                futures.append(
+                    executor.submit(
+                        process_tool, tool_def=tool_def, defaults=defaults, args=args
+                    )
+                )
 
+            for tool in [fs.result() for fs in as_completed(futures)]:
                 for error in tool._errors:
-                    errors_list.append((tool_def["name"], error))
-
-                if args.update:
-                    tool.update(
-                        verbose=args.verbose, force=args.force, skip=args.skip_current
-                    )
-                elif args.download:
-                    tool.download(
-                        verbose=args.verbose, force=args.force, skip=args.skip_current
-                    )
-                    if (tool.is_rpm or tool.is_deb) and tool.dl_ok:
-                        tools_dld = True
-                else:
-                    tool.check(verbose=args.verbose, skip=args.skip_current)
-            except Exception as e:
-                errors_list.append((tool_def["name"], e))
+                    errors_list.append((tool.name, error))
+                if (tool.is_rpm or tool.is_deb) and tool.dl_ok:
+                    tools_dld = True
+                for msg in tool._outputs:
+                    print(msg)
 
         if tools_dld:
             if args.verbose >= 2:
