@@ -375,8 +375,8 @@ tools:
     inst:
       - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}"
     ver_remote:
-      url: https://ngrok.com/docs/ngrok-agent/changelog
-      regex: 'ngrok Agent ([\d\.]+)'
+      url: https://github.com/ngrok/docker-ngrok/branches
+      regex: 'release-([\d\.]+)'
   - name: zoom
     type: direct
     url: https://zoom.us/client/latest/zoom_x86_64.rpm
