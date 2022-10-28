@@ -268,8 +268,13 @@ class ToolGit(Tool):
 
         self._errors = []
         self._outputs = []
-        self._get_data_remote()
-        self._get_data_local()
+
+    def get_data(self) -> None:
+        try:
+            self._get_data_remote()
+            self._get_data_local()
+        except Exception as e:
+            self._errors.append(e)
 
     def _get_data_remote(self) -> None:
         if self.__env_token_name:
@@ -299,7 +304,7 @@ class ToolGit(Tool):
                 self.v_remote = resp["tag_name"].strip("v")
                 if not self.custom:
                     assets = resp["assets"]
-        elif self.look_up == "tags":
+        elif self.look_up in ["tags", "branches"]:
             if not "^" in self.tag and not "$" in self.tag:
                 git_tag = list(filter(lambda i: self.tag in i["name"], resp))
             if self.tag.startswith("^"):
@@ -376,8 +381,13 @@ class ToolDirect(Tool):
 
         self._errors = []
         self._outputs = []
-        self._get_data_remote()
-        self._get_data_local()
+
+    def get_data(self) -> None:
+        try:
+            self._get_data_remote()
+            self._get_data_local()
+        except Exception as e:
+            self._errors.append(e)
 
     def _get_data_remote(self) -> None:
         if self.url:
@@ -455,7 +465,12 @@ class ToolCustom(Tool):
 
         self._errors = []
         self._outputs = []
-        self._get_data_local()
+
+    def get_data(self) -> None:
+        try:
+            self._get_data_local()
+        except Exception as e:
+            self._errors.append(e)
 
     @classmethod
     def from_tool(cls, tool: Tool) -> None:
@@ -645,6 +660,7 @@ def process_tool(tool_def: dict, defaults: dict, args: argparse.Namespace) -> To
         tool = ToolDirect(tool_def, defaults)
     else:
         tool = ToolCustom(tool_def, defaults)
+    tool.get_data()
 
     if args.update:
         tool.update(verbose=args.verbose, force=args.force, skip=args.skip_current)
