@@ -210,8 +210,7 @@ class Tool:
                 if fp := glob.glob(os.path.expandvars(file_name)):
                     file_path = max(fp, key=lambda f: os.stat(f).st_ctime)
                 else:
-                    self._errors.append(f"File '{file_name}' not found")
-                    return
+                    raise OSError(f"File '{file_name}' not found")
 
                 if rx := self.ver.get("regex"):
                     if m := re.search(rx, file_path):
@@ -229,7 +228,7 @@ class Tool:
                             elif m and m.group():
                                 self.v_local = m.group()
         except Exception as e:
-            self._errors.append(self.name, e)
+            self._errors.append(e)
 
 
 class ToolGit(Tool):
@@ -457,17 +456,16 @@ class ToolCustom(Tool):
             tool_def.get("pkg_dir", defaults.get("pkg_dir"))
         )
 
-        getattr(self, f"_get_data_{self.name}")()
-        if self.pkg_name.endswith("rpm"):
-            self.is_rpm = True
-        if self.pkg_name.endswith("deb"):
-            self.is_deb = True
-
         self._errors = []
         self._outputs = []
 
     def get_data(self) -> None:
         try:
+            getattr(self, f"_get_data_{self.name}")()
+            if self.pkg_name.endswith("rpm"):
+                self.is_rpm = True
+            if self.pkg_name.endswith("deb"):
+                self.is_deb = True
             self._get_data_local()
         except Exception as e:
             self._errors.append(e)
