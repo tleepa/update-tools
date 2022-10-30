@@ -258,6 +258,7 @@ class ToolGit(Tool):
         self.is_deb = False
         self.dl_ok = False
         self.v_local = None
+        self.v_remote = None
 
         self.bin_dir = os.path.expandvars(tool_def.get("bin_dir", defaults["bin_dir"]))
         self.opt_dir = os.path.expandvars(tool_def.get("opt_dir", defaults["opt_dir"]))
@@ -346,6 +347,7 @@ class ToolGit(Tool):
                 f"https://api.github.com/repos/{self.repo}/{self.look_up}/{self.tag}"
             )
             custom_tool = ToolCustom.from_tool(self)
+            custom_tool.get_data()
             self.pkg_url = custom_tool.pkg_url
             self.pkg_name = custom_tool.pkg_name
 
