@@ -84,6 +84,14 @@ tools:
       - tar.gz
     inst:
       - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.name }}"
+  - name: act
+    type: git
+    repo: nektos/act
+    incl:
+      - Linux_x86_64
+      - tar.gz
+    inst:
+      - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.name }}"
   - name: gdu
     type: git
     repo: dundee/gdu
