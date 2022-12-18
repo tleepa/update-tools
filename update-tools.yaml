@@ -393,7 +393,7 @@ tools:
     inst:
       - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}"
     ver_remote:
-      url: https://github.com/ngrok/docker-ngrok/branches
+      url: https://github.com/ngrok/docker-ngrok/branches/all
       regex: 'release-([\d\.]+)'
   - name: zoom
     type: direct
