@@ -51,12 +51,6 @@ tools:
     incl:
       - linux-amd64
       - rpm
-  - name: koodo
-    type: git
-    repo: troyeguo/koodo-reader
-    incl:
-      - Koodo
-      - rpm
   - name: drawio
     type: git
     repo: jgraph/drawio-desktop
@@ -73,7 +67,7 @@ tools:
     type: git
     repo: displaylink-rpm/displaylink-rpm
     incl:
-      - fedora-36
+      - fedora-37
       - x86_64
       - rpm
   - name: jqp
@@ -301,7 +295,7 @@ tools:
     type: git
     repo: derailed/k9s
     incl:
-      - Linux_x86_64
+      - Linux_amd64
       - tar.gz
     inst:
       - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.name }}"
@@ -393,8 +387,8 @@ tools:
     inst:
       - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}"
     ver_remote:
-      url: https://github.com/ngrok/docker-ngrok/branches/all
-      regex: 'release-([\d\.]+)'
+      url: https://raw.githubusercontent.com/ngrok/docker-ngrok/main/releases.json
+      regex: '\s+"version": "(.*?)"'
   - name: zoom
     type: direct
     url: https://zoom.us/client/latest/zoom_x86_64.rpm
