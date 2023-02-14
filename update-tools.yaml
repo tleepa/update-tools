@@ -218,10 +218,10 @@ tools:
       - asc
     inst:
       - mkdir -p "{{ tool.opt_dir }}/{{ tool.name }}"
+      - rm -rf "{{ tool.opt_dir }}/{{ tool.name }}/*"
       - tar --strip-components=1 -C "{{ tool.opt_dir }}/{{ tool.name }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}"
     ver:
-      type: file
-      name: "{{ tool.opt_dir }}/{{ tool.name }}/pdfsam-basic-*.jar"
+      name: "ls -1 {{ tool.opt_dir }}/{{ tool.name }}/lib/"
       regex: 'pdfsam-basic-(.*?).jar'
   - name: markdown2confluence
     type: git
@@ -350,6 +350,15 @@ tools:
     excl:
       - asc
       - '-'
+    inst:
+      - install "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.bin_dir }}/{{ tool.name }}"
+  - name: yq
+    type: git
+    repo: mikefarah/yq
+    incl:
+      - yq_linux_amd64
+    excl:
+      - tar.gz
     inst:
       - install "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.bin_dir }}/{{ tool.name }}"
   - name: awscli
