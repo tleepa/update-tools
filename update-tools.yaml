@@ -368,9 +368,9 @@ tools:
     tag: "^2."
     url: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
     inst:
-      - unzip "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" -d "{{ tool.tmp_dir }}/"
+      - unzip -o "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" -d "{{ tool.tmp_dir }}/"
       - '"{{ tool.tmp_dir }}/aws/install" -i "{{ tool.opt_dir }}/aws-cli" -b "{{ tool.bin_dir }}" --update'
-      - rm -rf "{{ tool.tmp_dir }}/aws*"
+      - rm -rf "{{ tool.tmp_dir }}/aws/"
     ver:
       name: "aws --version"
       regex: 'aws-cli/(.*?) '
