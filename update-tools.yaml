@@ -383,6 +383,16 @@ tools:
       - tar --strip-components=1 -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" --wildcards --no-anchored "*/{{ tool.name }}"
     ver:
       regex: 'azcopy version (\d.*)'
+  - name: bicep
+    type: git
+    repo: Azure/bicep
+    incl:
+      - linux-x64
+      - bicep
+    inst:
+      - install "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.bin_dir }}/{{ tool.name }}"
+    ver:
+      regex: 'version (.*?) \('
 
   - name: azuredatastudio
     type: git
