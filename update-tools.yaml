@@ -98,9 +98,9 @@ tools:
       - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" --transform='s/{{ tool.name }}.*/{{ tool.name }}/'
     ver:
       regex: 'v([\d\.]+)'
-  - name: aztfy
+  - name: aztfexport
     type: git
-    repo: Azure/aztfy
+    repo: Azure/aztfexport
     incl:
       - linux_amd64
       - zip
