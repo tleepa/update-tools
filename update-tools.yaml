@@ -436,3 +436,11 @@ tools:
     package: "-x86_64-linux-gtk.zip"
     inst:
       - sudo unzip -o "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" -d /usr
+  - name: 7z
+    type: custom
+    url: https://www.7-zip.org/download.html
+    inst:
+      - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" 7zz 7zzs
+    ver:
+      name: 7zz
+      regex: 7-Zip \(z\) ([\d.]+) \(x64\)

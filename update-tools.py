@@ -252,7 +252,7 @@ class ToolGit(Tool):
         self.inst = tool_def.get("inst", [])
         self.ver = defaults["ver"].copy()
         if tool_def.get("ver"):
-            for (key, value) in tool_def.get("ver").items():
+            for key, value in tool_def.get("ver").items():
                 self.ver[key] = value
         self.is_rpm = False
         self.is_deb = False
@@ -367,7 +367,7 @@ class ToolDirect(Tool):
         self.inst = tool_def.get("inst", [])
         self.ver = defaults["ver"].copy()
         if tool_def.get("ver"):
-            for (key, value) in tool_def.get("ver").items():
+            for key, value in tool_def.get("ver").items():
                 self.ver[key] = value
         self.is_rpm = False
         self.is_deb = False
@@ -437,7 +437,7 @@ class ToolCustom(Tool):
         self.inst = tool_def.get("inst", [])
         self.ver = defaults["ver"].copy()
         if tool_def.get("ver"):
-            for (key, value) in tool_def.get("ver").items():
+            for key, value in tool_def.get("ver").items():
                 self.ver[key] = value
         self.is_rpm = False
         self.is_deb = False
@@ -552,6 +552,23 @@ class ToolCustom(Tool):
             self.v_remote = m.groups()[0]
         else:
             self.v_remote = None
+
+    def _get_data_7z(self) -> None:
+        r = requests.get(self.url)
+        if m := re.search(R"Download 7-Zip ([\d\.]+)", r.content.decode()):
+            self.v_remote = m.groups()[0]
+        else:
+            self.v_remote = None
+
+        if m := re.search(R'A href="(a/(7z\d+-linux-x64.tar.xz))', r.content.decode()):
+            u = urllib.parse.urlsplit(self.url)
+            self.pkg_url = urllib.parse.urlunsplit(
+                (u.scheme, u.netloc, f"/{m.groups()[0]}", "", "")
+            )
+            self.pkg_name = m.groups()[1]
+        else:
+            self.pkg_url = None
+            self.pkg_name = None
 
 
 def version_mismatch(v_remote: str, v_local: str) -> bool:
