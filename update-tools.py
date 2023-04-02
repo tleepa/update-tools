@@ -809,16 +809,16 @@ def main():
 
         tools_dld = False
         errors_list = []
-        futures = []
         with ThreadPoolExecutor() as executor:
-            for tool_def in sorted(tools, key=lambda item: item["name"]):
-                futures.append(
-                    executor.submit(
-                        process_tool, tool_def=tool_def, defaults=defaults, args=args
-                    )
+            futures = [
+                executor.submit(
+                    process_tool, tool_def=tool_def, defaults=defaults, args=args
                 )
+                for tool_def in sorted(tools, key=lambda item: item["name"])
+            ]
 
-            for tool in [fs.result() for fs in as_completed(futures)]:
+            for future in as_completed(futures):
+                tool = future.result()
                 for error in tool._errors:
                     errors_list.append((tool.name, error))
                 if (tool.is_rpm or tool.is_deb) and tool.dl_ok:
