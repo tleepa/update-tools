@@ -399,6 +399,16 @@ tools:
     repo: microsoft/azuredatastudio
     custom: yes
     package: "azuredatastudio-linux-{{ tool.v_remote.strip('v') }}.rpm"
+  - name: et
+    type: git
+    repo: solidiquis/erdtree
+    incl:
+      - x86_64-unknown-linux-gnu
+      - tar.gz
+    inst:
+      - tar -C "{{ tool.opt_dir }}/{{ tool.name }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}"
+    ver:
+      regex: 'version (.*?) \('
 
   - name: ngrok
     type: direct
