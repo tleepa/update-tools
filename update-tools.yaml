@@ -31,7 +31,7 @@ tools:
     type: git
     repo: charmbracelet/glow
     incl:
-      - linux_amd64
+      - x86_64
       - rpm
   - name: dive
     type: git
@@ -393,6 +393,15 @@ tools:
       - install "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.bin_dir }}/{{ tool.name }}"
     ver:
       regex: 'version (.*?) \('
+  - name: docker-compose
+    type: git
+    repo: docker/compose
+    incl:
+      - linux-x86_64
+    excl:
+      - sha256
+    inst:
+      - install "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.bin_dir }}/{{ tool.name }}"
 
   - name: azuredatastudio
     type: git
