@@ -21,6 +21,21 @@ tools:
     incl:
       - LINUX.Qt5-1.x86_64
       - rpm
+  - name: rustdesk
+    type: git
+    repo: rustdesk/rustdesk
+    incl:
+      - x86_64
+      - rpm
+    excl:
+      - suse
+  - name: pingnoo
+    type: git
+    repo: nedrysoft/pingnoo
+    incl:
+      - fc33
+      - x86_64
+      - rpm
   - name: duf
     type: git
     repo: muesli/duf
@@ -45,6 +60,8 @@ tools:
     incl:
       - x86_64
       - rpm
+    excl:
+      - suse
   - name: rclone
     type: git
     repo: rclone/rclone
