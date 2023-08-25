@@ -74,12 +74,12 @@ tools:
   #   incl:
   #     - x86_64
   #     - rpm
-  - name: teams-for-linux
-    type: git
-    repo: IsmaelMartinez/teams-for-linux
-    incl:
-      - x86_64
-      - rpm
+  # - name: teams-for-linux
+  #   type: git
+  #   repo: IsmaelMartinez/teams-for-linux
+  #   incl:
+  #     - x86_64
+  #     - rpm
   - name: displaylink
     type: git
     repo: displaylink-rpm/displaylink-rpm
