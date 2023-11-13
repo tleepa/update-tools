@@ -115,6 +115,16 @@ tools:
       - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" --transform='s/{{ tool.name }}.*/{{ tool.name }}/'
     ver:
       regex: 'v([\d\.]+)'
+  - name: eza
+    type: git
+    repo: eza-community/eza
+    incl:
+      - x86_64
+      - linux
+      - gnu
+      - zip
+    inst:
+      - unzip -o "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" -d "{{ tool.bin_dir }}/"
   - name: aztfexport
     type: git
     repo: Azure/aztfexport
