@@ -436,9 +436,9 @@ tools:
     ver_remote:
       url: https://raw.githubusercontent.com/ngrok/docker-ngrok/main/releases.json
       regex: '\s+"version": "(.*?)"'
-  - name: zoom
-    type: direct
-    url: https://zoom.us/client/latest/zoom_x86_64.rpm
+  # - name: zoom
+  #   type: direct
+  #   url: https://zoom.us/client/latest/zoom_x86_64.rpm
   - name: minikube
     type: direct
     url: https://storage.googleapis.com/minikube/releases/latest/minikube-latest.x86_64.rpm
