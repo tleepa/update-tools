@@ -355,10 +355,7 @@ tools:
     type: git
     repo: atanunq/viu
     incl:
-      - viu
-    excl:
-      - asc
-      - '-'
+      - viu-x86_64-unknown-linux-musl
     inst:
       - install "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.bin_dir }}/{{ tool.name }}"
   - name: yq
