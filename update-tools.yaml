@@ -306,6 +306,8 @@ tools:
     incl:
       - Linux_amd64
       - tar.gz
+    excl:
+      - sbom
     inst:
       - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.name }}"
     ver:
@@ -341,6 +343,12 @@ tools:
       - rpm
     ver:
       regex: 'version v(.*?),'
+  - name: trip
+    type: git
+    repo: fujiapple852/trippy
+    incl:
+      - x86_64
+      - rpm
   - name: ytcast
     type: git
     repo: MarcoLucidi01/ytcast
@@ -351,6 +359,16 @@ tools:
       - tar --strip-components=1 -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" --wildcards --no-anchored "*/{{ tool.name }}"
     ver:
       name: "{{ tool.name }} -v"
+  - name: lazygit
+    type: git
+    repo: jesseduffield/lazygit
+    incl:
+      - Linux_x86_64
+      - tar.gz
+    inst:
+      - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" {{ tool.name }}
+    ver:
+      regex: 'version=(.*?),'
   - name: viu
     type: git
     repo: atanunq/viu
