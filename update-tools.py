@@ -189,7 +189,7 @@ class Tool:
                 cmd = tm.render(tool=self)
                 if shutil.which(shlex.split(cmd)[0]):
                     ver = re.sub(
-                        R"\x1b\[\d+m",
+                        r"\x1b\[\d+m",
                         "",
                         subprocess.run(
                             shlex.split(cmd), capture_output=True, encoding="UTF-8"
@@ -493,7 +493,7 @@ class ToolCustom(Tool):
     def _get_data_azuredatastudio(self) -> None:
         r = requests.get(self.url)
         if m := re.search(
-            R"\[linux-rpm\]: (.*)\r", json.loads(r.content.decode())["body"]
+            r"\[linux-rpm\]: (.*)\r", json.loads(r.content.decode())["body"]
         ):
             self.pkg_url = m.groups()[0]
         else:
@@ -508,12 +508,12 @@ class ToolCustom(Tool):
     def _get_data_usbimager(self) -> None:
         r = requests.get(self.url)
         if m := re.search(
-            R"Linux PC.*?\[GTK\+\]\((.*?" + self.package + ")\)", r.content.decode()
+            r"Linux PC.*?\[GTK\+\]\((.*?" + self.package + r")\)", r.content.decode()
         ):
             self.pkg_url = m.groups()[0]
             self.pkg_name = self.pkg_url.split("/")[-1]
             self.v_remote = re.search(
-                R"usbimager_(.*?)" + self.package, self.pkg_name
+                r"usbimager_(.*?)" + self.package, self.pkg_name
             ).groups()[0]
         else:
             self.pkg_url = None
@@ -523,7 +523,7 @@ class ToolCustom(Tool):
         self.pkg_url = self.url
 
         r = requests.get(self.pkg_url, stream=True)
-        if m := re.search(R".*filename=(.*)", r.headers["Content-Disposition"]):
+        if m := re.search(r".*filename=(.*)", r.headers["Content-Disposition"]):
             self.pkg_name = m.groups()[0]
         else:
             self.pkg_name = None
@@ -537,30 +537,30 @@ class ToolCustom(Tool):
     def _get_data_icaclient(self) -> None:
         r = requests.get(self.url)
         if m := re.search(
-            R'rel="(.*ICAClient-rhel.*x86_64.rpm.*?)"', r.content.decode()
+            r'rel="(.*ICAClient-rhel.*x86_64.rpm.*?)"', r.content.decode()
         ):
             self.pkg_url = f"http:{m.groups()[0]}"
         else:
             self.pkg_url = None
 
-        if m := re.search(R"ICAClient.*rpm", self.pkg_url):
+        if m := re.search(r"ICAClient.*rpm", self.pkg_url):
             self.pkg_name = m.group()
         else:
             self.pkg_name = None
 
-        if m := re.search(R"rhel-(.*)-", self.pkg_name):
+        if m := re.search(r"rhel-(.*)-", self.pkg_name):
             self.v_remote = m.groups()[0]
         else:
             self.v_remote = None
 
     def _get_data_7z(self) -> None:
         r = requests.get(self.url)
-        if m := re.search(R"Download 7-Zip ([\d\.]+)", r.content.decode()):
+        if m := re.search(r"Download 7-Zip ([\d\.]+)", r.content.decode()):
             self.v_remote = m.groups()[0]
         else:
             self.v_remote = None
 
-        if m := re.search(R'A href="(a/(7z\d+-linux-x64.tar.xz))', r.content.decode()):
+        if m := re.search(r'A href="(a/(7z\d+-linux-x64.tar.xz))', r.content.decode()):
             u = urllib.parse.urlsplit(self.url)
             self.pkg_url = urllib.parse.urlunsplit(
                 (u.scheme, u.netloc, f"/{m.groups()[0]}", "", "")
