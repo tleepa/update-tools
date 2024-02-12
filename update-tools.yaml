@@ -84,7 +84,7 @@ tools:
     type: git
     repo: displaylink-rpm/displaylink-rpm
     incl:
-      - fedora-38
+      - fedora-39
       - x86_64
       - rpm
   - name: jqp
