@@ -353,6 +353,30 @@ tools:
       - sha256
     inst:
       - tar --strip-components=1 -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" --wildcards --no-anchored "*/{{ tool.name }}"
+  - name: csvq
+    type: git
+    repo: mithrandie/csvq
+    incl:
+      - linux-amd64
+      - tar.gz
+    inst:
+      - tar --strip-components=1 -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" --wildcards --no-anchored "*/{{ tool.name }}"
+  - name: gocsv
+    type: git
+    repo: aotimme/gocsv
+    incl:
+      - linux-amd64
+      - zip
+    inst:
+      - unzip -jo "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" -d "{{ tool.bin_dir }}/"
+  - name: mlr
+    type: git
+    repo: johnkerl/miller
+    incl:
+      - linux-amd64
+      - tar.gz
+    inst:
+      - tar --strip-components=1 -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" --wildcards --no-anchored "*/{{ tool.name }}"
   - name: trip
     type: git
     repo: fujiapple852/trippy
