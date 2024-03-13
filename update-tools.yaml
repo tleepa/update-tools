@@ -205,6 +205,14 @@ tools:
       - sha256
     inst:
       - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" --transform='s/{{ tool.name }}.*/{{ tool.name }}/'
+  - name: ipinfo
+    type: git
+    repo: ipinfo/cli
+    incl:
+      - linux_amd64
+      - tar.gz
+    inst:
+      - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" --transform='s/{{ tool.name }}.*/{{ tool.name }}/'
   # - name: insomnia
   #   type: git
   #   repo: Kong/insomnia
