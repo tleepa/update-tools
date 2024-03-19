@@ -259,10 +259,10 @@ tools:
     excl:
       - libcurl
     inst:
-      - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.name }}-ff" "{{ tool.name }}-chrome" curl_chrome110 curl_edge101 curl_ff109
-      - mv "{{ tool.bin_dir }}/curl_chrome110" "{{ tool.bin_dir }}/curl-ch"
+      - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.name }}-ff" "{{ tool.name }}-chrome" curl_chrome116 curl_edge101 curl_ff117
+      - mv "{{ tool.bin_dir }}/curl_chrome116" "{{ tool.bin_dir }}/curl-ch"
       - mv "{{ tool.bin_dir }}/curl_edge101" "{{ tool.bin_dir }}/curl-ed"
-      - mv "{{ tool.bin_dir }}/curl_ff109" "{{ tool.bin_dir }}/curl-fx"
+      - mv "{{ tool.bin_dir }}/curl_ff117" "{{ tool.bin_dir }}/curl-fx"
     ver:
       name: "{{ tool.name }}-ff -V"
       regex: 'curl (.*) \('
