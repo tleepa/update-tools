@@ -111,6 +111,7 @@ tools:
       - tgz
     excl:
       - static
+      - "-x"
     inst:
       - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" --transform='s/{{ tool.name }}.*/{{ tool.name }}/'
     ver:
