@@ -205,6 +205,13 @@ tools:
       - install "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.bin_dir }}/oh-my-posh"
     ver:
       name: oh-my-posh --version
+  - name: fx
+    type: git
+    repo: antonmedv/fx
+    incl:
+      - fx_linux_amd64
+    inst:
+      - install "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.bin_dir }}/fx"
   - name: duckdb
     type: git
     repo: duckdb/duckdb
