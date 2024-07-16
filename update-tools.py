@@ -42,6 +42,7 @@ class Tool:
         if print_details and verbose >= 1:
             self._outputs.append(f"           remote name: {self.pkg_name}")
             self._outputs.append(f"            remote url: {self.pkg_url}")
+            self._outputs.append(f"           remote date: {self.v_remote_date}")
             self._outputs.append(f"        remote version: {self.v_remote}")
             self._outputs.append(f"         local version: {self.v_local}")
             self._outputs.append(f"        local packages: {self.pkg_local}")
@@ -98,7 +99,7 @@ class Tool:
                     f"        Not downloading package: {self.pkg_name}"
                 )
                 self._outputs.append(
-                    f"        Exisiting local packages: {self.pkg_local}"
+                    f"        Existing local packages: {self.pkg_local}"
                 )
                 self._outputs.append(f"        Local file size: {local_size}")
                 self._outputs.append(f"        Remote file size: {remote_size}")
@@ -259,6 +260,7 @@ class ToolGit(Tool):
         self.dl_ok = False
         self.v_local = None
         self.v_remote = None
+        self.v_remote_date = None
 
         self.bin_dir = os.path.expandvars(tool_def.get("bin_dir", defaults["bin_dir"]))
         self.opt_dir = os.path.expandvars(tool_def.get("opt_dir", defaults["opt_dir"]))
@@ -298,10 +300,12 @@ class ToolGit(Tool):
                     resp = list(filter(lambda i: not_tag not in i["tag_name"], resp))
                 resp = list(filter(lambda i: self.tag in i["tag_name"], resp))
                 self.v_remote = resp[0]["tag_name"].strip("v")
+                self.v_remote_date = resp[0]["published_at"]
                 if not self.custom:
                     assets = resp[0]["assets"]
             else:
                 self.v_remote = resp["tag_name"].strip("v")
+                self.v_remote_date = resp["published_at"]
                 if not self.custom:
                     assets = resp["assets"]
         elif self.look_up in ["tags", "branches"]:
@@ -373,6 +377,7 @@ class ToolDirect(Tool):
         self.is_deb = False
         self.v_local = None
         self.v_remote = None
+        self.v_remote_date = None
         self.dl_ok = False
 
         self.bin_dir = os.path.expandvars(tool_def.get("bin_dir", defaults["bin_dir"]))
@@ -443,6 +448,7 @@ class ToolCustom(Tool):
         self.is_deb = False
         self.v_local = tool_def.get("v_local")
         self.v_remote = tool_def.get("v_remote")
+        self.v_remote_date = None
         self.dl_ok = False
 
         self.bin_dir = os.path.expandvars(
@@ -483,6 +489,7 @@ class ToolCustom(Tool):
             "is_rpm": tool.is_rpm,
             "v_local": tool.v_local,
             "v_remote": tool.v_remote,
+            "v_remote_date": tool.v_remote_date,
             "bin_dir": tool.bin_dir,
             "opt_dir": tool.opt_dir,
             "tmp_dir": tool.tmp_dir,
