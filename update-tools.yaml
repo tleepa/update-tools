@@ -172,6 +172,8 @@ tools:
     incl:
       - linux_x86_64
       - tar.gz
+    excl:
+      - sig
     inst:
       - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.name }}"
   - name: lf
