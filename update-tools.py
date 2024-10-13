@@ -109,6 +109,7 @@ class Tool:
     def update(self, verbose, force=False, skip=False) -> None:
         update = False
         if force:
+            self._outputs.append(f"{Color.YLW}    {self.name}{Color.RST}")
             update = True
             if verbose >= 2:
                 self._outputs.append("        Update forced")
@@ -686,11 +687,11 @@ def process_tool(tool_def: dict, defaults: dict, args: argparse.Namespace) -> To
         tool = ToolCustom(tool_def, defaults)
     tool.get_data()
 
+    if args.download:
+        tool.download(verbose=args.verbose, force=args.force, skip=args.skip_current)
     if args.update:
         tool.update(verbose=args.verbose, force=args.force, skip=args.skip_current)
-    elif args.download:
-        tool.download(verbose=args.verbose, force=args.force, skip=args.skip_current)
-    else:
+    if args.check or not (args.download or args.update):
         tool.check(verbose=args.verbose, skip=args.skip_current)
 
     return tool
@@ -724,7 +725,7 @@ def main():
             action="store_true",
             help="download new version only (refreshes local repository)",
         )
-        group.add_argument(
+        parser.add_argument(
             "-u",
             "--update",
             action="store_true",
