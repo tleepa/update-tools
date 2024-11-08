@@ -166,6 +166,16 @@ tools:
       - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.name }}"
     ver:
       regex: 'v([\d\.].*?) '
+  - name: terraform-cleaner
+    type: git
+    repo: sylwit/terraform-cleaner
+    incl:
+      - linux_amd64
+      - tar.gz
+    inst:
+      - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.name }}"
+    ver:
+      name: 'echo 0.0.4'
   - name: terramate
     type: git
     repo: mineiros-io/terramate
@@ -241,18 +251,6 @@ tools:
       - tar.gz
     inst:
       - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" --transform='s/{{ tool.name }}.*/{{ tool.name }}/'
-  # - name: insomnia
-  #   type: git
-  #   repo: Kong/insomnia
-  #   tag: core
-  #   not_tags:
-  #     - alpha
-  #     - beta
-  #   incl:
-  #     - Core
-  #     - rpm
-  #   ver:
-  #     file:
   - name: pdfsam
     type: git
     repo: torakiki/pdfsam
@@ -488,21 +486,6 @@ tools:
       - install "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.bin_dir }}/{{ tool.name }}"
     ver:
       regex: 'version (.*?) \('
-  - name: docker-compose
-    type: git
-    repo: docker/compose
-    incl:
-      - linux-x86_64
-    excl:
-      - sha256
-    inst:
-      - install "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.bin_dir }}/{{ tool.name }}"
-
-  - name: azuredatastudio
-    type: git
-    repo: microsoft/azuredatastudio
-    custom: yes
-    package: "azuredatastudio-linux-{{ tool.v_remote.strip('v') }}.rpm"
   - name: et
     type: git
     repo: solidiquis/erdtree
@@ -522,22 +505,10 @@ tools:
     ver_remote:
       url: https://raw.githubusercontent.com/ngrok/docker-ngrok/main/releases.json
       regex: '\s+"version": "(.*?)"'
-  # - name: zoom
-  #   type: direct
-  #   url: https://zoom.us/client/latest/zoom_x86_64.rpm
   - name: minikube
     type: direct
     url: https://storage.googleapis.com/minikube/releases/latest/minikube-latest.x86_64.rpm
 
-  # - name: postman
-  #   type: custom
-  #   url: https://dl.pstmn.io/download/latest/linux64
-  #   inst:
-  #     - tar -C "{{ tool.opt_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}"
-  #   ver:
-  #     type: file
-  #     name: "{{ tool.opt_dir }}/Postman/app/resources/app/package.json"
-  #     regex: '^  "version": "(.*?)"'
   # - name: icaclient
   #   type: custom
   #   url: https://www.citrix.com/downloads/workspace-app/linux/workspace-app-for-linux-latest.html
