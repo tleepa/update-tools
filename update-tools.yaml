@@ -48,37 +48,17 @@ tools:
     incl:
       - linux_amd64
       - rpm
-  # - name: onlyoffice
-  #   type: git
-  #   repo: ONLYOFFICE/DesktopEditors
-  #   incl:
-  #     - x86_64
-  #     - rpm
-  #   excl:
-  #     - suse
   - name: rclone
     type: git
     repo: rclone/rclone
     incl:
       - linux-amd64
       - rpm
-  # - name: drawio
-  #   type: git
-  #   repo: jgraph/drawio-desktop
-  #   incl:
-  #     - x86_64
-  #     - rpm
-  # - name: teams-for-linux
-  #   type: git
-  #   repo: IsmaelMartinez/teams-for-linux
-  #   incl:
-  #     - x86_64
-  #     - rpm
   - name: displaylink
     type: git
     repo: displaylink-rpm/displaylink-rpm
     incl:
-      - fedora-40
+      - fedora-41
       - x86_64
       - rpm
   - name: jqp
@@ -301,18 +281,6 @@ tools:
       - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.name }}"
     ver:
       name: "{{ tool.name }} version -s"
-  # - name: storageexplorer
-  #   type: git
-  #   repo: microsoft/AzureStorageExplorer
-  #   incl:
-  #     - StorageExplorer-linux-x64
-  #     - tar.gz
-  #   inst:
-  #     - tar -C "{{ tool.opt_dir }}/{{ tool.name }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}"
-  #   ver:
-  #     type: file
-  #     name: "{{ tool.opt_dir }}/{{ tool.name }}/resources/app/package.json"
-  #     regex: '^  "version": "(.*?)"'
   - name: jira-cli
     type: git
     repo: ankitpokhrel/jira-cli
