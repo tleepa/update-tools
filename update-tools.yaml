@@ -361,6 +361,16 @@ tools:
       - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" {{ tool.name }}
     ver:
       regex: 'version=(.*?),'
+  - name: lazydocker
+    type: git
+    repo: jesseduffield/lazydocker
+    incl:
+      - Linux_x86_64
+      - tar.gz
+    inst:
+      - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" {{ tool.name }}
+    ver:
+      regex: 'Version: (.*)'
   - name: viu
     type: git
     repo: atanunq/viu
@@ -400,9 +410,6 @@ tools:
     type: direct
     url: https://storage.googleapis.com/minikube/releases/latest/minikube-latest.x86_64.rpm
 
-  # - name: icaclient
-  #   type: custom
-  #   url: https://www.citrix.com/downloads/workspace-app/linux/workspace-app-for-linux-latest.html
   - name: usbimager
     type: custom
     url: https://gitlab.com/bztsrc/usbimager/raw/master/README.md
