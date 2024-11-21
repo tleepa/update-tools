@@ -410,6 +410,11 @@ tools:
     type: direct
     url: https://storage.googleapis.com/minikube/releases/latest/minikube-latest.x86_64.rpm
 
+  - name: azuredatastudio
+    type: git
+    repo: microsoft/azuredatastudio
+    custom: yes
+    package: "azuredatastudio-linux-{{ tool.v_remote.strip('v') }}.rpm"
   - name: usbimager
     type: custom
     url: https://gitlab.com/bztsrc/usbimager/raw/master/README.md
