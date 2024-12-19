@@ -15,6 +15,16 @@ defaults:
     token_env: GITHUB_TOKEN
 
 tools:
+  - name: eza
+    type: git
+    repo: eza-community/eza
+    incl:
+      - x86_64
+      - linux
+      - gnu
+      - zip
+    inst:
+      - unzip -o "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" -d "{{ tool.bin_dir }}/"
   - name: peazip
     type: git
     repo: peazip/PeaZip
