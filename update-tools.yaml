@@ -46,12 +46,6 @@ tools:
       - fc33
       - x86_64
       - rpm
-  - name: glow
-    type: git
-    repo: charmbracelet/glow
-    incl:
-      - x86_64
-      - rpm
   - name: dive
     type: git
     repo: wagoodman/dive
