@@ -29,7 +29,7 @@ tools:
     type: git
     repo: peazip/PeaZip
     incl:
-      - LINUX.Qt5-1.x86_64
+      - LINUX.Qt6-1.x86_64
       - rpm
   - name: rustdesk
     type: git
