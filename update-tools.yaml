@@ -401,6 +401,15 @@ tools:
       - install "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.bin_dir }}/{{ tool.name }}"
     ver:
       regex: 'version (.*?) \('
+  - name: uv
+    type: git
+    repo: astral-sh/uv
+    incl:
+      - x86_64-unknown-linux-gnu
+    excl:
+      - sha256
+    inst:
+      - tar --strip-components=1 -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" --wildcards --no-anchored "*/{{ tool.name }}*"
 
   - name: ngrok
     type: direct
