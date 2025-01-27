@@ -134,6 +134,18 @@ tools:
       - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.name }}"
     ver:
       name: 'echo 0.0.4'
+  - name: yazi
+    type: git
+    repo: sxyazi/yazi
+    incl:
+      - x86_64-unknown-linux
+      - zip
+    excl:
+      - musl
+    inst:
+      - unzip -jo "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" -d "{{ tool.bin_dir }}" "*/ya" "*/yazi"
+    ver:
+      regex: '(\d.*) \('
   - name: posh
     type: git
     repo: JanDeDobbeleer/oh-my-posh
