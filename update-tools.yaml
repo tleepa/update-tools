@@ -134,16 +134,6 @@ tools:
       - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.name }}"
     ver:
       name: 'echo 0.0.4'
-  - name: lf
-    type: git
-    repo: gokcehan/lf
-    incl:
-      - lf-linux-amd64
-      - tar.gz
-    inst:
-      - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}"
-    ver:
-      regex: '.*'
   - name: spf
     type: git
     repo: MHNightCat/superfile
