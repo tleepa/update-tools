@@ -406,6 +406,22 @@ tools:
       - install "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.bin_dir }}/{{ tool.name }}"
     ver:
       regex: 'version (.*?) \('
+  - name: azure-functions-cli
+    type: git
+    repo: Azure/azure-functions-core-tools
+    incl:
+      - linux-x64
+      - zip
+    excl:
+      - sha2
+    inst:
+      - mkdir -p "{{ tool.opt_dir }}/microsoft/{{ tool.name }}"
+      - sudo rm -rf /opt/microsoft/{{ tool.name }}/*
+      - unzip -o "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" -d {{ tool.opt_dir }}/microsoft/{{ tool.name }}
+      - chmod u+x {{ tool.opt_dir }}/microsoft/{{ tool.name }}/func
+      - chmod u+x {{ tool.opt_dir }}/microsoft/{{ tool.name }}/gozip
+    ver:
+      cmd: func --version
   - name: uv
     type: git
     repo: astral-sh/uv
