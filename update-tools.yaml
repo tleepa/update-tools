@@ -134,15 +134,6 @@ tools:
       - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.name }}"
     ver:
       name: 'echo 0.0.4'
-  - name: spf
-    type: git
-    repo: MHNightCat/superfile
-    incl:
-      - linux
-      - amd64
-      - tar.gz
-    inst:
-      - tar --strip-components=3 -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" --wildcards --no-anchored "*/{{ tool.name }}"
   - name: posh
     type: git
     repo: JanDeDobbeleer/oh-my-posh
