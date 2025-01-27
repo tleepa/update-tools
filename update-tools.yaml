@@ -214,7 +214,7 @@ tools:
       - asc
     inst:
       - mkdir -p "{{ tool.opt_dir }}/{{ tool.name }}"
-      - rm -rf "{{ tool.opt_dir }}/{{ tool.name }}/*"
+      - sudo rm -rf "{{ tool.opt_dir }}/{{ tool.name }}/*"
       - tar --strip-components=1 -C "{{ tool.opt_dir }}/{{ tool.name }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}"
     ver:
       name: "ls -1 {{ tool.opt_dir }}/{{ tool.name }}/lib/"
