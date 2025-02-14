@@ -94,6 +94,15 @@ tools:
       - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" --transform='s/{{ tool.name }}.*/{{ tool.name }}/'
     ver:
       regex: 'v([\d\.]+)'
+  - name: tenv
+    type: git
+    repo: tofuutils/tenv
+    incl:
+      - amd64
+      - rpm
+    excl:
+      - pem
+      - sig
   - name: trivy
     type: git
     repo: aquasecurity/trivy
