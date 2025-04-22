@@ -31,6 +31,12 @@ tools:
     incl:
       - LINUX.Qt6-1.x86_64
       - rpm
+  - name: sourcegit
+    type: git
+    repo: sourcegit-scm/sourcegit
+    incl:
+      - x86_64
+      - rpm
   - name: rustdesk
     type: git
     repo: rustdesk/rustdesk
