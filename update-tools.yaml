@@ -68,7 +68,7 @@ tools:
     type: git
     repo: displaylink-rpm/displaylink-rpm
     incl:
-      - fedora-41
+      - fedora-42
       - x86_64
       - rpm
   - name: jqp
@@ -246,19 +246,17 @@ tools:
       regex: 'markdown2confluence (.*)'
   - name: curl-impersonate
     type: git
-    repo: lwthiker/curl-impersonate
+    repo: lexiforest/curl-impersonate
     incl:
       - x86_64-linux-gnu
       - tar.gz
     excl:
       - libcurl
     inst:
-      - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.name }}-ff" "{{ tool.name }}-chrome" curl_chrome116 curl_edge101 curl_ff117
-      - mv "{{ tool.bin_dir }}/curl_chrome116" "{{ tool.bin_dir }}/curl-ch"
-      - mv "{{ tool.bin_dir }}/curl_edge101" "{{ tool.bin_dir }}/curl-ed"
-      - mv "{{ tool.bin_dir }}/curl_ff117" "{{ tool.bin_dir }}/curl-fx"
+      - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.name }}" curl_chrome136 curl_firefox135
+      - mv "{{ tool.bin_dir }}/curl_chrome136" "{{ tool.bin_dir }}/curl-ch"
+      - mv "{{ tool.bin_dir }}/curl_firefox135" "{{ tool.bin_dir }}/curl-fx"
     ver:
-      name: "{{ tool.name }}-ff -V"
       regex: 'curl (.*) \('
   - name: govc
     type: git
@@ -329,6 +327,7 @@ tools:
     repo: YS-L/csvlens
     incl:
       - linux
+      - x86_64
       - tar.xz
     excl:
       - sha256
@@ -436,7 +435,7 @@ tools:
       - chmod u+x {{ tool.opt_dir }}/microsoft/{{ tool.name }}/func
       - chmod u+x {{ tool.opt_dir }}/microsoft/{{ tool.name }}/gozip
     ver:
-      cmd: func --version
+      name: func --version
   - name: uv
     type: git
     repo: astral-sh/uv
@@ -459,11 +458,6 @@ tools:
     type: direct
     url: https://storage.googleapis.com/minikube/releases/latest/minikube-latest.x86_64.rpm
 
-  - name: azuredatastudio
-    type: git
-    repo: microsoft/azuredatastudio
-    custom: yes
-    package: "azuredatastudio-linux-{{ tool.v_remote.strip('v') }}.rpm"
   - name: usbimager
     type: custom
     url: https://gitlab.com/bztsrc/usbimager/raw/master/README.md
