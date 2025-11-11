@@ -1,4 +1,4 @@
-#! /usr/bin/env python3
+#! /usr/bin/env python
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
