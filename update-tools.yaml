@@ -42,6 +42,12 @@ tools:
       - fc33
       - x86_64
       - rpm
+  - name: rclone
+    type: git
+    repo: rclone/rclone
+    incl:
+      - linux-amd64
+      - rpm
   - name: displaylink
     type: git
     repo: displaylink-rpm/displaylink-rpm
@@ -126,18 +132,6 @@ tools:
       - chmod u+x {{ tool.opt_dir }}/microsoft/{{ tool.name }}/gozip
     ver:
       name: func --version
-
-  - name: ngrok
-    type: direct
-    url: https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
-    inst:
-      - tar -C "{{ tool.bin_dir }}" -xvf "{{ tool.pkg_dir }}/{{ tool.pkg_name }}"
-    ver_remote:
-      url: https://raw.githubusercontent.com/ngrok/docker-ngrok/main/releases.json
-      regex: '\s+"version": "(.*?)"'
-  - name: minikube
-    type: direct
-    url: https://storage.googleapis.com/minikube/releases/latest/minikube-latest.x86_64.rpm
 
   - name: usbimager
     type: custom
