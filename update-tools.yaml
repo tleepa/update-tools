@@ -15,6 +15,16 @@ defaults:
     token_env: GITHUB_TOKEN
 
 tools:
+  - name: bicep
+    type: git
+    repo: Azure/bicep
+    incl:
+      - linux-x64
+      - bicep
+    inst:
+      - install "{{ tool.pkg_dir }}/{{ tool.pkg_name }}" "{{ tool.bin_dir }}/{{ tool.name }}"
+    ver:
+      regex: 'version (.*?) \('
   - name: peazip
     type: git
     repo: peazip/PeaZip
@@ -52,7 +62,7 @@ tools:
     type: git
     repo: displaylink-rpm/displaylink-rpm
     incl:
-      - fedora-42
+      - fedora-43
       - x86_64
       - rpm
   - name: pdfsam
