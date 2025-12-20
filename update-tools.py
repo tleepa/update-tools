@@ -170,7 +170,7 @@ class Tool:
                     capture_output=True,
                     encoding="UTF-8",
                 ).stdout.strip("\n")
-                if not "not installed" in ver:
+                if "not installed" not in ver:
                     self.v_local = ver
             elif self.pkg_local and self.is_deb:
                 deb_info = subprocess.run(
@@ -183,7 +183,7 @@ class Tool:
                 ver_lines = [line for line in deb_info.split("\n") if "Version" in line]
                 if ver_lines:
                     ver = ver_lines[0].split(":")[1].strip()
-                if not "not installed" in ver:
+                if "not installed" not in ver:
                     self.v_local = ver
             elif self.ver.get("type") == "cmd":
                 ver_cmd = self.ver.get("name")
@@ -310,7 +310,7 @@ class ToolGit(Tool):
                 if not self.custom:
                     assets = resp["assets"]
         elif self.look_up in ["tags", "branches"]:
-            if not "^" in self.tag and not "$" in self.tag:
+            if "^" not in self.tag and "$" not in self.tag:
                 git_tag = list(filter(lambda i: self.tag in i["name"], resp))
             if self.tag.startswith("^"):
                 git_tag = list(
@@ -663,7 +663,7 @@ def update_repo(repo_path: str) -> None:
         raise RuntimeError(f"Failed to update RPM repo in {repo_path}")
 
     deb_cmd = subprocess.run(
-        shlex.split(f"dpkg-scanpackages -m ."),
+        shlex.split("dpkg-scanpackages -m ."),
         cwd=os.path.expandvars(repo_path),
         capture_output=True,
     )
@@ -706,7 +706,7 @@ def main():
         parser.add_argument(
             "-g",
             "--config-file",
-            help=f"path to configuration file, defaults to <script dir>/<script name>.yaml",
+            help="path to configuration file, defaults to <script dir>/<script name>.yaml",
             type=argparse.FileType("r"),
             default=f"{script_file_name}.yaml",
         )
@@ -770,7 +770,7 @@ def main():
         defaults = data_loaded.get("defaults", {})
 
         for key in defaults_dict.keys():
-            if not type(defaults_dict[key]) is dict:
+            if type(defaults_dict[key]) is not dict:
                 try:
                     defaults[key] = defaults[key]
                 except KeyError:
