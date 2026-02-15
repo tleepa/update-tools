@@ -55,6 +55,15 @@ tools:
       - fedora-43
       - x86_64
       - rpm
+  - name: plasmazones
+    type: git
+    repo: fuddlesworth/PlasmaZones
+    incl:
+      - fc43
+      - x86_64
+      - rpm
+    excl:
+      - debug
   - name: pdfsam
     type: git
     repo: torakiki/pdfsam
