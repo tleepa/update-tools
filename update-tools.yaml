@@ -52,7 +52,7 @@ tools:
     type: git
     repo: displaylink-rpm/displaylink-rpm
     incl:
-      - fedora-43
+      - fedora-44
       - x86_64
       - rpm
   - name: pdfsam
