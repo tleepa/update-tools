@@ -27,14 +27,6 @@ tools:
     incl:
       - x86_64
       - rpm
-  - name: rustdesk
-    type: git
-    repo: rustdesk/rustdesk
-    incl:
-      - x86_64
-      - rpm
-    excl:
-      - suse
   - name: pingnoo
     type: git
     repo: nedrysoft/pingnoo
