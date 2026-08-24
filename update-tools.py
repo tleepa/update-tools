@@ -1,5 +1,14 @@
 #! /usr/bin/env python
 
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#   "jinja2",
+#   "pyyaml",
+#   "requests",
+# ]
+# ///
+
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from jinja2 import Template
